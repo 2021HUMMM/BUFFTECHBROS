@@ -1,2 +1,4 @@
-api_key_newsapi.txt
+.env
 db.sqlite3
+requirements.txt
+/env

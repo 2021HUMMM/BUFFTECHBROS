@@ -1,1 +1,16 @@
 <head> SAYA SANGAT SUKA MEMBUAT APLIKASI DAN WEB :DD </head>
+<!--for each news_data-->
+
+<body>
+    {% if news_data %}
+        {% for news in news_data %}
+        <div class="news-item">
+            <h2>{{ news.title }}</h2>
+            <p>{{ news.description }}</p>
+            <a href="{{ news.url }}" target="_blank">Read more</a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No news available.</p>
+    {% endif %}
+</body>
