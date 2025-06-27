@@ -5,4 +5,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('authentication.urls')),
     path('main/', include('main.urls')),
+    path('ocr/', include('OCRTool.urls')),
 ]

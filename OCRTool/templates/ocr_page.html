@@ -1,0 +1,11 @@
+<h2>Upload Image for OCR</h2>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Process Image</button>
+</form>
+
+{% if text_result %}
+  <h3>Extracted Text:</h3>
+  <pre>{{ text_result }}</pre>
+{% endif %}

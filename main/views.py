@@ -10,9 +10,9 @@ def show_main(request):
     news_data = get_news(request, "bitcoin")
     # Pass news data to the template
     context = {
-        'news_data': news_data
+        'news_data': news_data['articles']
     }
-    return render(request, 'main.html', {'news_data': news_data['articles']})
+    return render(request, 'main.html', context)
 
 def get_news(request, topic):
     newsapi = NewsApiClient(settings.NEWS_API_KEY)
