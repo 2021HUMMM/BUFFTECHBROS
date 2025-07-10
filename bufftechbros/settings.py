@@ -17,6 +17,7 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 NEWS_API_KEY = config('NEWS_API_KEY')
 OPENAI_API_KEY = config('OPENAI_API_KEY')
+NEWS_API_KEY_2 = config('NEWS_API_KEY_2')  # Uncomment if you have a second API key
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
