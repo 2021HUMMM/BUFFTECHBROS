@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from newsapi import NewsApiClient
 from django.conf import settings
 from easyocr import Reader
@@ -9,6 +9,20 @@ import spacy
 import openai
 
 nlp = spacy.load("en_core_web_sm")
+
+# Page Navigator
+
+def main_redirect(request):
+    # Redirect based on authentication status
+    if request.user.is_authenticated:
+        return redirect('main:show_main')
+    else:
+        return render(request, 'landing.html')
+
+def landing_page(request):
+    return render(request, 'landing.html')
+
+# News Processes
 
 def extract_query_from_text(text):
     doc = nlp(text)
