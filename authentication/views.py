@@ -21,11 +21,15 @@ def register_user(request):
 
     if request.method == "POST":
         form = UserCreationForm(request.POST)
+
         if form.is_valid():
             form.save()
             messages.success(request, 'Your account has been successfully created!')
+            
             return redirect('authentication:login')
+    
     context = {'form':form}
+    
     return render(request, 'register.html', context)
 
 def login_user(request):
@@ -35,15 +39,30 @@ def login_user(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+
             response = HttpResponseRedirect(reverse("main:show_main"))
             response.set_cookie('last_login', str(datetime.datetime.now()))
+
             return response
+        
         else:
             messages.error(request, 'Wrong username or password')
 
     else:
         form = AuthenticationForm(request)
+
     context = {'form': form}
+    
     return render(request, 'login.html', context)
 
+@login_required
+def logout_user(request):
+    username = request.user.username
 
+    logout(request)
+    
+    messages.success(request, f'You ({username}) have been successfully logged out')
+    response = HttpResponseRedirect(reverse('main:main_redirect'))
+    response.delete_cookie('last_login')
+
+    return response
