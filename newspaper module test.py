@@ -1,6 +1,6 @@
 from newspaper import Article
 
-url = "https://mediaindonesia.com/premium/197/jejak-chromebook-di-balik-digitalisasi-sekolah-dan-potensi-kerugian-negara"
+url = "https://sport.detik.com/sepakbola/liga-indonesia/d-8018540/pssi-dorong-pembangunan-ekosistem-pelatih-sepakbola"
 
 article = Article(url)
 article.download()

@@ -1,20 +1,54 @@
 from django.conf import settings
 from django.shortcuts import render
+from django.http import JsonResponse
 import requests
 from newspaper import Article
 
 def show_news(request):
-    news_data = get_news("bitcoin")  # you can change this to dynamic input
-    # combined_news = combine_news(news_data)  # combine all articles into one string
-    trending_news = get_trending_news()  # fetch trending news
+    search_query = request.GET.get('search', '')
+    category = request.GET.get('category', '')
+    
+    # Get trending news with search and category filters
+    trending_news = get_trending_news(search_query, category)
+
     context = {
-        'news_data': news_data,  # this is a list of article dictionaries
-        # 'combined_news': combined_news,  # this is the combined text of all articles
-        'trending_news': trending_news,  # this is the list of trending articles
+        'trending_news': trending_news,
+        'search_query': search_query,
+        'category': category,
     }
     return render(request, 'news.html', context)
 
-def get_trending_news():
+def search_news_api(request):
+    """API endpoint for AJAX search"""
+    search_query = request.GET.get('search', '')
+    category = request.GET.get('category', '')
+    
+    # Get trending news with search filters
+    trending_news = get_trending_news(search_query, category)
+    
+    # Format data for JSON response
+    news_list = []
+    for news in trending_news:
+        news_data = {
+            'title': news.get('title', ''),
+            'description': news.get('description', ''),
+            'link': news.get('link', ''),
+            'source': news.get('source_id', ''),
+            'source_icon': news.get('source_icon', ''),
+            'pubDate': news.get('pubDate', ''),
+            'image_url': news.get('image_url', ''),
+        }
+        news_list.append(news_data)
+    
+    return JsonResponse({
+        'success': True,
+        'news': news_list,
+        'count': len(news_list),
+        'search_query': search_query,
+        'category': category
+    })
+
+def get_trending_news(search_query='', category=''):
     url = "https://newsdata.io/api/1/news"
     params = {
         "apikey": settings.NEWS_API_KEY_2,
@@ -22,12 +56,46 @@ def get_trending_news():
         "language": "id",        # Bahasa Indonesia
         "category": "top",       # bisa juga 'business', 'politics', dll
     }
+    
+    # Add search query if provided
+    if search_query:
+        params["q"] = search_query
+    
+    # Add category filter if provided
+    if category:
+        params["category"] = category
 
     try:
         response = requests.get(url, params=params)
         response.raise_for_status()
         data = response.json()
-        return data.get("results", [])
+        results = data.get("results", [])
+        
+        # If we have a search query but no results, try with broader search
+        if search_query and not results:
+            # Try without category filter first
+            if category:
+                params_backup = params.copy()
+                del params_backup["category"]
+                response = requests.get(url, params=params_backup)
+                response.raise_for_status()
+                data = response.json()
+                results = data.get("results", [])
+            
+            # If still no results, try with global search
+            if not results:
+                params_global = {
+                    "apikey": settings.NEWS_API_KEY_2,
+                    "q": search_query,
+                    "language": "en",  # Try English for broader results
+                }
+                response = requests.get(url, params=params_global)
+                response.raise_for_status()
+                data = response.json()
+                results = data.get("results", [])
+        
+        return results
+        
     except requests.exceptions.RequestException as e:
         print("Trending News Fetch Error:", e)
         return []

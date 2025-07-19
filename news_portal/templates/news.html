@@ -24,11 +24,89 @@
     </div>
   </div>
 
+  <!-- Search Section -->
+  <div class="bg-gradient-to-r from-blue-600 to-purple-600">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="text-center">
+        <h2 class="text-2xl font-bold text-white mb-4">Search Latest News</h2>
+        <form method="GET" action="{% url 'news_portal:show_news' %}" class="max-w-2xl mx-auto">
+          <div class="relative">
+            <input 
+              type="text" 
+              name="search"
+              id="searchInput"
+              value="{{ request.GET.search }}"
+              placeholder="Search for news articles, topics, or sources... (Ctrl+K)"
+              class="w-full px-6 py-4 text-lg rounded-full border-0 shadow-lg focus:outline-none focus:ring-4 focus:ring-white/20 placeholder-gray-400"
+            >
+            <button 
+              type="submit"
+              class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="flex flex-wrap justify-center gap-2 mt-4">
+            <button 
+              type="submit" 
+              name="category"
+              value=""
+              class="category-btn px-4 py-2 text-sm font-medium rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-200 {% if not request.GET.category %}bg-white text-blue-600{% endif %}">
+              All News
+            </button>
+            <button 
+              type="submit" 
+              name="category"
+              value="technology"
+              class="category-btn px-4 py-2 text-sm font-medium rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-200 {% if request.GET.category == 'technology' %}bg-white text-blue-600{% endif %}">
+              Technology
+            </button>
+            <button 
+              type="submit" 
+              name="category"
+              value="business"
+              class="category-btn px-4 py-2 text-sm font-medium rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-200 {% if request.GET.category == 'business' %}bg-white text-blue-600{% endif %}">
+              Business
+            </button>
+            <button 
+              type="submit" 
+              name="category"
+              value="politics"
+              class="category-btn px-4 py-2 text-sm font-medium rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-200 {% if request.GET.category == 'politics' %}bg-white text-blue-600{% endif %}">
+              Politics
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Main Content -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    {% if trending_news %}
-      <!-- News Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="hidden">
+      <div class="flex items-center justify-center py-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <span class="ml-3 text-gray-600">Searching news...</span>
+      </div>
+    </div>
+
+    <!-- Search Results Info -->
+    <div id="searchInfo" class="search-info hidden">
+      <div class="flex items-center justify-center gap-2 text-gray-700">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span id="searchInfoText"></span>
+        <button id="clearFilters" class="ml-4 text-blue-600 hover:text-blue-800 text-sm font-medium">Clear filters</button>
+      </div>
+    </div>
+
+    <!-- News Grid Container -->
+    <div id="newsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% if trending_news %}
         {% for news in trending_news %}
         <article class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden border border-gray-100">
           <!-- News Image with Source Icon -->
@@ -112,19 +190,19 @@
           </div>
         </article>
         {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="text-center py-16 {% if trending_news %}hidden{% endif %}">
+      <div class="mx-auto h-24 w-24 text-gray-400 mb-4">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-full h-full">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+        </svg>
       </div>
-    {% else %}
-      <!-- Empty State -->
-      <div class="text-center py-16">
-        <div class="mx-auto h-24 w-24 text-gray-400 mb-4">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-full h-full">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
-          </svg>
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No news available</h3>
-        <p class="text-gray-500">Check back later for the latest trending news.</p>
-      </div>
-    {% endif %}
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No news available</h3>
+      <p class="text-gray-500">Try adjusting your search terms or check back later.</p>
+    </div>
   </div>
 
   <!-- Footer -->
@@ -141,6 +219,7 @@
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -148,6 +227,7 @@
   .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -169,5 +249,276 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
   }
+
+  /* Search styles */
+  .category-btn.active {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #2563eb !important;
+  }
+
+  /* Search results info */
+  .search-info {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
 </style>
+
+<script>
+  let searchTimeout = null;
+  let currentCategory = '';
+
+  // Add keyboard shortcut for search
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    
+    // Focus search input when Ctrl+K is pressed
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
+
+    // Clear search when Escape is pressed
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        this.value = '';
+        performSearch('', currentCategory);
+      }
+    });
+
+    // Real-time search with debouncing
+    searchInput.addEventListener('input', function(e) {
+      const query = e.target.value;
+      
+      // Clear previous timeout
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      
+      // Set new timeout for 500ms delay
+      searchTimeout = setTimeout(() => {
+        performSearch(query, currentCategory);
+      }, 500);
+    });
+
+    // Category button handlers
+    document.querySelectorAll('.category-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Update active button
+        document.querySelectorAll('.category-btn').forEach(btn => {
+          btn.classList.remove('bg-white', 'text-blue-600');
+          btn.classList.add('bg-white/20', 'text-white');
+        });
+        
+        this.classList.remove('bg-white/20', 'text-white');
+        this.classList.add('bg-white', 'text-blue-600');
+        
+        currentCategory = this.value;
+        const searchQuery = searchInput.value;
+        performSearch(searchQuery, currentCategory);
+      });
+    });
+
+    // Clear filters handler
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'clearFilters') {
+        clearFilters();
+      }
+    });
+  });
+
+  function performSearch(query, category) {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const newsGrid = document.getElementById('newsGrid');
+    const emptyState = document.getElementById('emptyState');
+    const searchInfo = document.getElementById('searchInfo');
+
+    // Show loading
+    loadingIndicator.classList.remove('hidden');
+    newsGrid.classList.add('opacity-50');
+
+    // Make AJAX request
+    const params = new URLSearchParams();
+    if (query) params.append('search', query);
+    if (category) params.append('category', category);
+
+    fetch(`{% url 'news_portal:search_news_api' %}?${params.toString()}`)
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading
+        loadingIndicator.classList.add('hidden');
+        newsGrid.classList.remove('opacity-50');
+
+        // Update search info
+        updateSearchInfo(data);
+
+        // Update news grid
+        updateNewsGrid(data.news);
+      })
+      .catch(error => {
+        console.error('Search error:', error);
+        loadingIndicator.classList.add('hidden');
+        newsGrid.classList.remove('opacity-50');
+        
+        // Show error message
+        showErrorMessage('Failed to search news. Please try again.');
+      });
+  }
+
+  function updateSearchInfo(data) {
+    const searchInfo = document.getElementById('searchInfo');
+    const searchInfoText = document.getElementById('searchInfoText');
+
+    if (data.search_query || data.category) {
+      let infoText = '';
+      if (data.search_query) {
+        infoText = `Showing results for "<strong>${data.search_query}</strong>"`;
+        if (data.category) {
+          infoText += ` in <strong>${data.category.charAt(0).toUpperCase() + data.category.slice(1)}</strong>`;
+        }
+      } else if (data.category) {
+        infoText = `Showing <strong>${data.category.charAt(0).toUpperCase() + data.category.slice(1)}</strong> news`;
+      }
+      infoText += ` - ${data.count} article${data.count !== 1 ? 's' : ''} found`;
+      
+      searchInfoText.innerHTML = infoText;
+      searchInfo.classList.remove('hidden');
+    } else {
+      searchInfo.classList.add('hidden');
+    }
+  }
+
+  function updateNewsGrid(newsData) {
+    const newsGrid = document.getElementById('newsGrid');
+    const emptyState = document.getElementById('emptyState');
+
+    if (newsData.length === 0) {
+      newsGrid.innerHTML = '';
+      emptyState.classList.remove('hidden');
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+    
+    // Generate HTML for news articles
+    const newsHTML = newsData.map(news => createNewsArticleHTML(news)).join('');
+    newsGrid.innerHTML = newsHTML;
+  }
+
+  function createNewsArticleHTML(news) {
+    return `
+      <article class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden border border-gray-100">
+        <!-- News Image with Source Icon -->
+        <div class="h-48 bg-gradient-to-r from-blue-400 to-purple-500 relative overflow-hidden">
+          ${news.source_icon ? `
+            <img 
+              src="${news.source_icon}" 
+              alt="${news.source} logo"
+              class="w-full h-full object-cover"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            >
+            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center" style="display: none;">
+              <div class="text-white text-6xl opacity-75">📰</div>
+            </div>
+          ` : `
+            <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+              <div class="text-white text-6xl opacity-75">📰</div>
+            </div>
+          `}
+          
+          <!-- Overlay with source info and breaking news badge -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent">
+            <div class="absolute top-4 left-4">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white text-blue-600 shadow-sm">
+                Breaking News
+              </span>
+            </div>
+            
+            ${news.source ? `
+            <div class="absolute bottom-4 left-4">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-black/70 text-white shadow-sm">
+                📰 ${news.source}
+              </span>
+            </div>
+            ` : ''}
+          </div>
+        </div>
+        
+        <!-- News Content -->
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2 hover:text-blue-600 transition-colors duration-200">
+            ${news.title}
+          </h2>
+          
+          <p class="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
+            ${news.description}
+          </p>
+          
+          <!-- Action Buttons -->
+          <div class="flex items-center gap-3 mb-3">
+            <a 
+              href="${news.link}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 shadow-md">
+              <span>Read More</span>
+              <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+            </a>
+
+            <button
+              type="button"
+              class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-purple-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 transform hover:scale-105 shadow-md">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+              <span>Compare</span>
+            </button>
+          </div>
+          
+          <!-- Timestamp -->
+          <div class="flex items-center text-gray-400">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-xs">${news.pubDate}</span>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function clearFilters() {
+    const searchInput = document.getElementById('searchInput');
+    searchInput.value = '';
+    currentCategory = '';
+    
+    // Reset category buttons
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.classList.remove('bg-white', 'text-blue-600');
+      btn.classList.add('bg-white/20', 'text-white');
+    });
+    
+    // Set "All News" as active
+    const allNewsBtn = document.querySelector('.category-btn[value=""]');
+    if (allNewsBtn) {
+      allNewsBtn.classList.remove('bg-white/20', 'text-white');
+      allNewsBtn.classList.add('bg-white', 'text-blue-600');
+    }
+    
+    performSearch('', '');
+  }
+
+  function showErrorMessage(message) {
+    // You can implement a toast notification here
+    console.error(message);
+  }
+</script>
 {% endblock content %}
