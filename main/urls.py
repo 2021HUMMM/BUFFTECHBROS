@@ -11,4 +11,5 @@ urlpatterns = [
     path('', show_main, name='show_main'),
     path('test-gpt/', test_chat, name='test_chat'),
     path('landing/', landing_page, name='landing_page'),
+    path('redirect/', main_redirect, name='main_redirect'),
 ]

@@ -1,5 +1,9 @@
 <h1> SAYA SANGAT SUKA MEMBUAT APLIKASI DAN WEB :DD </h1>
 <!--for each news_data-->
+<button type="button" onclick="window.location.href='{% url 'authentication:logout' %}'">
+  Logout
+</button>
+
 <button type="button" onclick="window.location.href='{% url 'news_portal:show_news' %}'">
   Show News
 </button>
