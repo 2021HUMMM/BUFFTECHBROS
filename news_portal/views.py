@@ -3,6 +3,8 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import requests
 from newspaper import Article
+from analyzer.views import get_keywords
+
 
 def show_news(request):
     search_query = request.GET.get('search', '')
@@ -131,5 +133,5 @@ def combine_news(data):
             except:
                 pass
     return combined_news.strip()  # remove trailing newline
-    
+
 

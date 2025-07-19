@@ -5,10 +5,8 @@ from easyocr import Reader
 from PIL import Image
 import io
 from main.forms import ImageUploadForm
-import spacy
 import openai
 
-nlp = spacy.load("en_core_web_sm")
 
 # Page Navigator
 
@@ -22,23 +20,6 @@ def main_redirect(request):
 def landing_page(request):
     return render(request, 'landing.html')
 
-# News Processes
-
-def extract_query_from_text(text):
-    doc = nlp(text)
-
-    # Ambil named entities
-    entities = [ent.text for ent in doc.ents if ent.label_ in ["PERSON", "ORG", "GPE", "EVENT", "DATE"]]
-
-    # Ambil noun phrases
-    noun_phrases = [chunk.text for chunk in doc.noun_chunks]
-
-    # Gabungkan, hindari duplikat
-    phrases = list(dict.fromkeys(entities + noun_phrases))
-
-    # Ambil maksimal 5 frasa teratas
-    query_string = " ".join(phrases[:5])
-    return query_string
 
 def show_main(request):
     text_result = None
@@ -65,7 +46,6 @@ def show_main(request):
     context = {
         'form': form,
         'text_result': text_result,
-        'keywords': extract_query_from_text(text_result) if text_result else None,
     }
 
     return render(request, 'main.html', context)

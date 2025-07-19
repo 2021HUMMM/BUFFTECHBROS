@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'authentication',
     'main',
     'news_portal',
+    'analyzer',
 ]
 
 MIDDLEWARE = [
