@@ -1,6 +1,6 @@
 from newspaper import Article
 
-url = "https://mediaindonesia.com/internasional/788620/wacana-membawa-kasus-juliana-ke-hukum-internasional-yusril-pemerintah-belum-terima-nota-diplomatik-dari-brasil"
+url = "https://mediaindonesia.com/premium/197/jejak-chromebook-di-balik-digitalisasi-sekolah-dan-potensi-kerugian-negara"
 
 article = Article(url)
 article.download()
