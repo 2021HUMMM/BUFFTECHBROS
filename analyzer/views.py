@@ -28,9 +28,12 @@ def get_keywords(page_string):
         ]
     )
     reply = str(response.choices[0].message.content.strip())
-    reply = reply.split(',')  # Split the reply into a list of keywords
+    reply = reply.replace("'", "").replace('"', '').replace("\n", "")
 
-    return reply
+    # turn reply into a list of keywords
+    keywords = [keyword.strip() for keyword in reply.split(',') if keyword.strip()]
+
+    return keywords
 
 
 
