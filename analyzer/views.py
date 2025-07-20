@@ -36,8 +36,6 @@ def get_keywords(page_string):
     return keywords
 
 
-    
-
 
 # def test_chat(request):
 #     reply = None

@@ -61,8 +61,7 @@ def logout_user(request):
 
     logout(request)
     
-    messages.success(request, f'You ({username}) have been successfully logged out')
-    response = HttpResponseRedirect(reverse('main:main_redirect'))
+    response = HttpResponseRedirect(reverse('root'))
     response.delete_cookie('last_login')
 
     return response
