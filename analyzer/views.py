@@ -988,4 +988,375 @@ def ai_comparison_api(request):
             'success': False,
             'error': f'Analysis failed: {str(e)}. Please try again.'
         }, status=500)
+
+# Image news analyzer
+def analyze_ocr_text(ocr_text, manual_publish_date=None):
+    """Analyze OCR extracted text (headlines/snippets) and find related news"""
+    print(f"\n🔍 Starting OCR text analysis...")
+    print(f"📝 OCR text: {ocr_text[:200]}...")
     
+    try:
+        # Extract keywords from OCR text
+        print(f"🏷️ Extracting keywords from OCR text...")
+        keywords = get_keywords(ocr_text)
+        keywords_list = keywords if isinstance(keywords, list) else [str(keywords)]
+        print(f"🔑 Keywords extracted: {keywords_list}")
+        
+        # Use manual date if provided, otherwise use current date
+        target_date = None
+        if manual_publish_date:
+            try:
+                target_date = datetime.strptime(manual_publish_date, '%Y-%m-%d')
+                print(f"📅 Using manual date: {target_date}")
+            except ValueError:
+                target_date = datetime.now()
+                print(f"⚠️ Invalid date format, using today: {target_date}")
+        else:
+            target_date = datetime.now()
+            print(f"📅 Using current date: {target_date}")
+        
+        # Find related news (no sentiment analysis since we lack full original content)
+        print(f"🔗 Finding related news for OCR content...")
+        related_news = find_related_news(
+            keywords_list, 
+            target_date, 
+            original_url=None,  # No original URL for OCR
+            original_text=None,  # No full text for sentiment analysis
+            limit=10
+        )
+        
+        # Generate summary of related articles instead of sentiment comparison
+        print(f"📄 Generating content summary for {len(related_news)} articles...")
+        content_summary = generate_ocr_content_summary(ocr_text, related_news, keywords_list)
+        
+        print(f"✅ OCR analysis completed!")
+        print(f"📊 Results: {len(related_news)} related articles found")
+        
+        return {
+            'ocr_text': ocr_text,
+            'keywords': keywords_list[:10],
+            'target_date': target_date,
+            'manual_date_used': manual_publish_date is not None,
+            'related_news': related_news,
+            'content_summary': content_summary,
+            'analysis_type': 'OCR_CONTENT_SUMMARY',
+            'search_info': {
+                'target_date': target_date.strftime('%Y-%m-%d'),
+                'keywords_used': keywords_list[:6],
+                'total_found': len(related_news),
+                'analysis_method': 'OCR headline analysis + content summary',
+                'sorting_method': 'Similarity + Recency (no sentiment analysis)',
+                'limitation': 'Limited to headline analysis - full article sentiment comparison not available'
+            }
+        }
+        
+    except Exception as e:
+        print(f"❌ Error in OCR analysis: {e}")
+        return {
+            'ocr_text': ocr_text,
+            'keywords': [],
+            'target_date': None,
+            'related_news': [],
+            'content_summary': None,
+            'error': str(e),
+            'analysis_type': 'OCR_ERROR'
+        }
+
+def generate_ocr_content_summary(ocr_text, related_articles, keywords):
+    """Generate content summary for OCR analysis since we can't do sentiment comparison"""
+    
+    print(f"\n📝 Generating OCR content summary...")
+    print(f"📰 OCR text: {ocr_text[:100]}...")
+    print(f"📊 Related articles: {len(related_articles)}")
+    
+    if not related_articles:
+        return {
+            'summary': 'No related articles found to summarize.',
+            'content_analysis': 'Unable to provide content analysis - no related articles available.',
+            'coverage_overview': 'No coverage found for this topic.'
+        }
+    
+    # Get content from top related articles
+    articles_content = f"ORIGINAL OCR TEXT (from social media/image):\n{ocr_text}\n\n"
+    articles_content += f"SEARCH KEYWORDS USED: {', '.join(keywords[:5])}\n\n"
+    
+    # Fetch content from top 5 related articles
+    for i, article in enumerate(related_articles[:5], 1):
+        title = article.get('title', f'Article {i}')
+        similarity_score = article.get('similarity_score', 0)
+        source = article.get('source_id', 'Unknown')
+        pub_date = article.get('pubDate', 'Unknown date')
+        
+        # Try to get article content
+        article_content = ""
+        article_url = article.get('link')
+        if article_url:
+            try:
+                print(f"  📰 Fetching content for article {i}: {title[:40]}...")
+                news_article = Article(article_url)
+                news_article.download()
+                news_article.parse()
+                article_content = news_article.text[:1500] if news_article.text else ""
+                print(f"    ✅ Content fetched: {len(article_content)} chars")
+            except Exception as e:
+                print(f"    ❌ Failed to fetch content: {str(e)[:30]}...")
+                article_content = f"{article.get('description', 'No description available')}"
+        else:
+            article_content = f"{article.get('description', 'No description available')}"
+        
+        articles_content += f"RELATED ARTICLE {i} (Similarity: {similarity_score}):\n"
+        articles_content += f"Title: {title}\n"
+        articles_content += f"Source: {source}\n"
+        articles_content += f"Date: {pub_date}\n"
+        articles_content += f"Content: {article_content}...\n\n"
+    
+    # Create prompt for content summary (not sentiment comparison)
+    prompt = f"""
+    You are analyzing a headline/text extracted from social media (OCR) and related news articles found about the same topic.
+    Since this is OCR from social media, we don't have the full original article content, so focus on content summary rather than sentiment comparison.
+    
+    {articles_content}
+    
+    Please provide a comprehensive analysis in the following structure:
+
+    1. TOPIC ANALYSIS: What topic/event is this OCR text referring to based on the related articles found?
+    
+    2. RELATED COVERAGE: Summary of how different news sources are covering this topic
+    
+    3. KEY INFORMATION: The most important facts and details found across the related articles
+    
+    4. SOURCE DIVERSITY: Analysis of the variety of sources covering this topic
+    
+    5. CONTENT VERIFICATION: Based on the related articles, does the OCR text appear to be about a legitimate news topic?
+    
+    6. SUMMARY: Overall summary of what we learned about this topic from the related articles
+
+    Keep the analysis factual and informative. Focus on providing context and information rather than opinion comparison.
+    Format your response in clear sections as requested above.
+    """
+    
+    try:
+        print(f"🤖 Sending to ChatGPT for content summary...")
+        print(f"📏 Content length: {len(articles_content)} characters")
+        
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+            max_tokens=2000
+        )
+        
+        summary_text = response.choices[0].message.content.strip()
+        print(f"✅ Content summary generated successfully")
+        print(f"📄 Summary length: {len(summary_text)} characters")
+        
+        # Parse sections like in the sentiment analysis
+        sections = {}
+        current_section = None
+        current_content = []
+        
+        for line in summary_text.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+                
+            # Check for section headers
+            if any(header in line.upper() for header in ['TOPIC ANALYSIS', 'RELATED COVERAGE', 'KEY INFORMATION', 'SOURCE DIVERSITY', 'CONTENT VERIFICATION', 'SUMMARY']):
+                # Save previous section
+                if current_section and current_content:
+                    sections[current_section] = '\n'.join(current_content)
+                
+                # Start new section
+                current_section = line.replace(':', '').strip()
+                current_content = []
+            else:
+                if current_section:
+                    current_content.append(line)
+        
+        # Save last section
+        if current_section and current_content:
+            sections[current_section] = '\n'.join(current_content)
+        
+        return {
+            'full_summary': summary_text,
+            'sections': sections,
+            'articles_analyzed': len(related_articles[:5]),
+            'analysis_type': 'CONTENT_SUMMARY'
+        }
+        
+    except Exception as e:
+        print(f"❌ Error generating content summary: {str(e)}")
+        return {
+            'full_summary': f'Error generating summary: {str(e)}',
+            'sections': {},
+            'articles_analyzed': 0,
+            'analysis_type': 'SUMMARY_ERROR'
+        }
+
+@csrf_exempt 
+def analyze_ocr_api(request):
+    """API endpoint for OCR text analysis"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        ocr_text = data.get('ocr_text', '').strip()
+        publish_date = data.get('publish_date', '')
+        
+        print(f"\n🌐 OCR API Request received:")
+        print(f"   📝 OCR text: {ocr_text[:100]}...")
+        print(f"   📅 Manual date: {publish_date if publish_date else 'Not provided'}")
+        
+        if not ocr_text:
+            return JsonResponse({
+                'success': False,
+                'error': 'No OCR text provided'
+            }, status=400)
+        
+        # Analyze OCR text
+        print(f"🚀 Starting OCR analysis...")
+        analysis_result = analyze_ocr_text(ocr_text, publish_date if publish_date else None)
+        
+        print(f"✅ OCR analysis completed")
+        return JsonResponse({
+            'success': True,
+            'analysis': analysis_result
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    except Exception as e:
+        print(f"❌ Error in OCR analysis API: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': f'OCR analysis failed: {str(e)}'
+        }, status=500)
+
+def extract_headline_from_image(image_file):
+    """Extract headline from image using OpenAI Vision API"""
+    print(f"\n👁️ Starting image headline extraction with OpenAI Vision...")
+    
+    try:
+        # Convert image to base64
+        import base64
+        import io
+        from PIL import Image
+        
+        # Open and process image
+        image = Image.open(image_file)
+        
+        # Convert to RGB if necessary
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        
+        # Resize if too large (OpenAI has size limits)
+        max_size = 1024
+        if max(image.size) > max_size:
+            ratio = max_size / max(image.size)
+            new_size = tuple(int(dim * ratio) for dim in image.size)
+            image = image.resize(new_size, Image.Resampling.LANCZOS)
+            print(f"📏 Resized image to: {new_size}")
+        
+        # Convert to base64
+        buffer = io.BytesIO()
+        image.save(buffer, format='JPEG', quality=85)
+        image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        
+        print(f"🖼️ Image processed, size: {len(image_base64)} characters")
+        
+        # Create prompt for headline extraction
+        prompt = """
+        You are analyzing an image that contains news headlines, likely from social media (Instagram, Facebook, Twitter, etc.) or news websites.
+        
+        Please:
+        1. Extract the main headline/news text from this image
+        2. Focus on the primary news content, ignore usernames, timestamps, reaction counts, etc.
+        3. If there are multiple headlines, prioritize the largest/most prominent one
+        4. Preserve the original language (English, Indonesian, etc.)
+        5. Return ONLY the headline text, no additional commentary
+        
+        If no clear headline is visible, respond with "NO_HEADLINE_FOUND"
+        """
+        
+        # Send to OpenAI Vision API
+        print(f"🤖 Sending to OpenAI Vision API...")
+        response = client.chat.completions.create(
+            model="gpt-4o",  # GPT-4 with vision
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": prompt
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{image_base64}",
+                                "detail": "high"
+                            }
+                        }
+                    ]
+                }
+            ],
+            max_tokens=500,
+            temperature=0.1  # Low temperature for more accurate extraction
+        )
+        
+        extracted_text = response.choices[0].message.content.strip()
+        
+        print(f"✅ Headline extracted successfully:")
+        print(f"📰 Result: {extracted_text}")
+        
+        if extracted_text == "NO_HEADLINE_FOUND":
+            return {
+                'success': False,
+                'error': 'No clear headline found in the image',
+                'extracted_text': None
+            }
+        
+        return {
+            'success': True,
+            'extracted_text': extracted_text,
+            'method': 'OpenAI Vision API',
+            'confidence': 'high'
+        }
+        
+    except Exception as e:
+        print(f"❌ Error in OpenAI Vision extraction: {str(e)}")
+        return {
+            'success': False,
+            'error': f'Vision API failed: {str(e)}',
+            'extracted_text': None
+        }
+
+def analyze_image_headline(image_file, manual_publish_date=None):
+    """Complete image analysis using OpenAI Vision + news analysis"""
+    print(f"\n🚀 Starting complete image headline analysis...")
+    
+    # Step 1: Extract headline using Vision API
+    extraction_result = extract_headline_from_image(image_file)
+    
+    if not extraction_result['success']:
+        return {
+            'extraction_error': extraction_result['error'],
+            'analysis_type': 'IMAGE_EXTRACTION_ERROR'
+        }
+    
+    headline_text = extraction_result['extracted_text']
+    print(f"📰 Extracted headline: {headline_text}")
+    
+    # Step 2: Analyze the extracted headline (same as OCR analysis)
+    print(f"🔍 Starting news analysis for extracted headline...")
+    analysis_result = analyze_ocr_text(headline_text, manual_publish_date)
+    
+    # Add extraction info to the result
+    analysis_result['extraction_method'] = 'OpenAI Vision API'
+    analysis_result['extraction_confidence'] = 'high'
+    analysis_result['original_image_processed'] = True
+    
+    return analysis_result

@@ -3,45 +3,117 @@
 {% block content %}
 <div class="min-h-screen bg-gray-50 p-6">
   <div class="max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">SAYA SANGAT SUKA MEMBUAT APLIKASI DAN WEB :DD</h1>
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">VerifAI - Image Headline Analyzer</h1>
     
-    <!-- Quick Actions -->
-    <div class="mb-8">
-      <button type="button" 
-              onclick="window.location.href='{% url 'news_portal:show_news' %}'"
-              class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 font-medium mr-4">
-        Show News
-      </button>
-    </div>
-
-    <!-- OCR Section -->
+    <!-- Image Upload Section -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h2 class="text-2xl font-semibold text-gray-900 mb-4">Upload Image for OCR</h2>
+      <h2 class="text-2xl font-semibold text-gray-900 mb-4">Upload Image with News Headline</h2>
+      <p class="text-gray-600 mb-4">Upload a screenshot from social media or news websites. Our AI will extract the headline and find related news.</p>
+      
       <form method="post" enctype="multipart/form-data" class="space-y-4">
         {% csrf_token %}
-        <div class="space-y-2">
+        <div class="space-y-4">
           {{ form.as_p }}
+          
+          <!-- Optional: Manual date input -->
+          <div>
+            <label for="publish_date" class="block text-sm font-medium text-gray-700 mb-2">
+              Publication Date (Optional)
+            </label>
+            <input type="date" 
+                   id="publish_date" 
+                   name="publish_date" 
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <p class="text-sm text-gray-500 mt-1">Leave empty to use current date for search</p>
+          </div>
         </div>
+        
         <button type="submit" 
-                class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-200 font-medium">
-          Process Image
+                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
+          🔍 Analyze Image Headline
         </button>
       </form>
     </div>
 
     <!-- Results Section -->
-    {% if text_result %}
-      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h3 class="text-xl font-semibold text-gray-900 mb-3">Extracted Text:</h3>
-        <pre class="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto">{{ text_result }}</pre>
-      </div>
-    {% endif %}
+    {% if image_analysis %}
+      {% if image_analysis.analysis_type == 'IMAGE_EXTRACTION_ERROR' %}
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+          <h3 class="text-lg font-semibold text-red-800 mb-2">❌ Image Analysis Error</h3>
+          <p class="text-red-700">{{ image_analysis.extraction_error }}</p>
+        </div>
+      {% elif image_analysis.analysis_type == 'OCR_CONTENT_SUMMARY' %}
+        <!-- Extracted Headline -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">📰 Extracted Headline</h3>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p class="text-gray-800 font-medium">{{ image_analysis.ocr_text }}</p>
+            <p class="text-sm text-blue-600 mt-2">✅ Extracted using OpenAI Vision API</p>
+          </div>
+        </div>
 
-    {% if keywords %}
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-xl font-semibold text-gray-900 mb-3">Search Query:</h3>
-        <pre class="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto">{{ keywords }}</pre>
-      </div>
+        <!-- Keywords -->
+        {% if image_analysis.keywords %}
+          <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-3">🏷️ Keywords Used for Search</h3>
+            <div class="flex flex-wrap gap-2">
+              {% for keyword in image_analysis.keywords %}
+                <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">{{ keyword }}</span>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Related News -->
+        {% if image_analysis.related_news %}
+          <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">📰 Related News Articles ({{ image_analysis.related_news|length }})</h3>
+            <div class="space-y-4">
+              {% for article in image_analysis.related_news %}
+                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                  <div class="flex justify-between items-start mb-2">
+                    <h4 class="font-semibold text-blue-600 hover:text-blue-800">
+                      <a href="{{ article.link }}" target="_blank" class="hover:underline">
+                        {{ article.title }}
+                      </a>
+                    </h4>
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                      {{ article.similarity_score }}% match
+                    </span>
+                  </div>
+                  <p class="text-gray-600 text-sm mb-2">{{ article.description|truncatewords:30 }}</p>
+                  <div class="flex justify-between items-center text-xs text-gray-500">
+                    <span>{{ article.source_id }}</span>
+                    <span>{{ article.pubDate|default:"Unknown date" }}</span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Content Summary -->
+        {% if image_analysis.content_summary %}
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">📊 AI Content Analysis</h3>
+            
+            {% if image_analysis.content_summary.sections %}
+              <div class="space-y-4">
+                {% for section_name, section_content in image_analysis.content_summary.sections.items %}
+                  <div class="border-l-4 border-blue-500 pl-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">{{ section_name }}</h4>
+                    <p class="text-gray-700 whitespace-pre-line">{{ section_content }}</p>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-gray-700">{{ image_analysis.content_summary.full_summary }}</p>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endif %}
     {% endif %}
   </div>
 </div>
