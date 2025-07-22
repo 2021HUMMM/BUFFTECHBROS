@@ -202,13 +202,23 @@
 
         <!-- URL Analysis Results -->
         {% if analyzed_article %}
-        <div class="bg-white border border-indigo-200 rounded-lg shadow-lg mb-8 p-6">
-          <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-            <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            Analysis Results
-          </h3>
+        <div id="analysisResultsContainer" class="bg-white border border-indigo-200 rounded-lg shadow-lg mb-8 p-6 relative">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-gray-900 flex items-center">
+              <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Analysis Results
+            </h3>
+            <button 
+              onclick="closeAnalysisResults()" 
+              class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-200"
+              title="Close analysis results">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
           
           <div class="grid md:grid-cols-2 gap-6 mb-6">
             <!-- Article Info -->
@@ -385,6 +395,11 @@
   .focus\:ring-red-500:focus {
     --tw-ring-color: #ef4444 !important;
   }
+
+  /* Analysis Results Container Styles */
+  #analysisResultsContainer {
+    transition: all 0.3s ease-in-out;
+  }
 </style>
 
 <script>
@@ -426,6 +441,37 @@
         window.location.href = url.toString();
       });
     });
+  });
+
+  // Close analysis results function
+  function closeAnalysisResults() {
+    const container = document.getElementById('analysisResultsContainer');
+    if (container) {
+      // Add closing animation
+      container.style.transform = 'translateY(-20px)';
+      container.style.opacity = '0';
+      
+      // Remove from DOM after animation
+      setTimeout(() => {
+        container.remove();
+        
+        // Update URL to remove analysis parameters
+        const url = new URL(window.location.href);
+        url.searchParams.delete('news_url');
+        url.searchParams.delete('publish_date');
+        url.searchParams.delete('analyze_url');
+        
+        // Update URL without page reload
+        window.history.replaceState({}, '', url.toString());
+      }, 300);
+    }
+  }
+
+  // Keyboard shortcut to close analysis (Escape key)
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('analysisResultsContainer')) {
+      closeAnalysisResults();
+    }
   });
 </script>
 {% endblock content %}
