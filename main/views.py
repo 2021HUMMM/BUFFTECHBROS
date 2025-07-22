@@ -6,6 +6,7 @@ from PIL import Image
 import io
 from main.forms import ImageUploadForm
 import openai
+from newspaper import Article
 
 
 # Page Navigator
@@ -22,6 +23,14 @@ def landing_page(request):
 
 
 def show_main(request):
+    news_article = Article("https://cenderawasihpos.jawapos.com/metropolis/22/07/2025/pastikan-program-mbg-harus-berkelanjutan/")
+    news_article.download()
+    news_article.parse()
+
+    print(f"     📰 Title: {news_article.title}"
+          f"\n     📰 Text: {news_article.text[:100]}")
+
+
     text_result = None
     if request.method == 'POST':
         form = ImageUploadForm(request.POST, request.FILES)

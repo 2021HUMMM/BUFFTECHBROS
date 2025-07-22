@@ -295,9 +295,6 @@
           <div class="border-t border-gray-200 pt-6">
             <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               Related Articles ({{ analyzed_article.related_news|length }})
-              {% if analyzed_article.related_news.0.sentiment_analysis %}
-              <span class="ml-2 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">Sorted by Disagreement</span>
-              {% endif %}
             </h4>
             <div class="grid md:grid-cols-2 gap-4">
               {% for news in analyzed_article.related_news %}
@@ -308,17 +305,9 @@
                     <span class="px-2 py-1 text-xs bg-indigo-100 text-indigo-700 rounded-full">
                       Similarity: {{ news.similarity_score|floatformat:1 }}
                     </span>
-                    {% if news.disagreement_score %}
-                    <span class="px-2 py-1 text-xs {% if news.disagreement_score >= 70 %}bg-red-100 text-red-700{% elif news.disagreement_score >= 40 %}bg-orange-100 text-orange-700{% else %}bg-green-100 text-green-700{% endif %} rounded-full">
-                      {{ news.disagreement_score|floatformat:1 }}% disagreement
-                    </span>
-                    {% endif %}
                   </div>
                 </div>
                 <p class="text-gray-600 text-xs mb-3">{{ news.description|default:"No description available"|truncatewords:15 }}</p>
-                {% if news.sentiment_analysis.analysis_summary %}
-                <p class="text-xs text-purple-700 mb-2 italic bg-purple-50 p-2 rounded">"{{ news.sentiment_analysis.analysis_summary|truncatewords:20 }}"</p>
-                {% endif %}
                 <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
                   <span>{{ news.source_id|default:"Unknown" }}</span>
                   <span>{{ news.pubDate|slice:":10" }}</span>

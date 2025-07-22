@@ -49,12 +49,14 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
             'sentiment_related': 'neutral',
             'disagreement_level': 'unknown',
             'confidence': 0,
-            'analysis_summary': 'No content available for analysis'
+            'analysis_summary': 'No content available for analysis',
+            'reason': 'Cannot analyze sentiment - no article content available for comparison'
         }
     
     # Create prompt for GPT-4 to analyze sentiment disagreement
     prompt = f"""
-    Analyze the sentiment and disagreement level between these two news articles about similar topics.
+    Analyze the sentiment and disagreement level between these two news articles about similar topics. The more those two articles have different opinions regarding the same topic,
+    the higher the disagreement score should be. for example, if one article's tone toward the topic is positive and the other is negative, the disagreement score should be high.
     
     KEYWORDS CONTEXT: {', '.join(keywords[:5])}
     
@@ -68,6 +70,7 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
     1. The sentiment of each article (positive/negative/neutral)
     2. How much they disagree with each other on the main topic
     3. Give a disagreement score from 0-100 (0=complete agreement, 100=complete disagreement)
+    4. Provide a clear reason explaining why you gave this disagreement score
     
     Respond in this exact JSON format:
     {{
@@ -76,7 +79,8 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
         "sentiment_related": "<positive/negative/neutral>",
         "disagreement_level": "<high/medium/low/minimal>",
         "confidence": <number 0-100>,
-        "analysis_summary": "<brief explanation of the disagreement or agreement>"
+        "analysis_summary": "<brief explanation of the disagreement or agreement>",
+        "reason": "<detailed explanation of why this disagreement score was given, mentioning specific points of agreement or disagreement>"
     }}
     """
     
@@ -93,19 +97,35 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
         response_text = response.choices[0].message.content.strip()
         print(f"     🤖 GPT-4 response: {response_text[:100]}...")
         
+        # Clean response text - remove markdown code blocks if present
+        cleaned_response = response_text
+        if cleaned_response.startswith('```json'):
+            cleaned_response = cleaned_response.replace('```json', '', 1)
+        if cleaned_response.endswith('```'):
+            cleaned_response = cleaned_response.rsplit('```', 1)[0]
+        cleaned_response = cleaned_response.strip()
+        
+        print(f"     🧹 Cleaned response: {cleaned_response[:100]}...")
+        
         # Parse JSON response
         import json
         try:
-            sentiment_data = json.loads(response_text)
+            sentiment_data = json.loads(cleaned_response)
             print(f"     ✅ Sentiment analysis completed:")
             print(f"        📊 Disagreement score: {sentiment_data.get('disagreement_score', 0)}")
             print(f"        🎭 Original sentiment: {sentiment_data.get('sentiment_original', 'neutral')}")
             print(f"        🎭 Related sentiment: {sentiment_data.get('sentiment_related', 'neutral')}")
             print(f"        📈 Disagreement level: {sentiment_data.get('disagreement_level', 'unknown')}")
+            print(f"        🧠 Confidence: {sentiment_data.get('confidence', 0)}%")
+            print(f"        💭 Analysis summary: {sentiment_data.get('analysis_summary', 'No summary')}")
+            print(f"        📝 Reason: {sentiment_data.get('reason', 'No reason provided')}...")
             return sentiment_data
             
         except json.JSONDecodeError:
             print(f"     ❌ Failed to parse JSON response, extracting manually...")
+            print(f"     🔍 Full response for debugging: {response_text}")
+            print(f"     🧹 Cleaned response for debugging: {cleaned_response}")
+            
             # Fallback parsing
             lines = response_text.split('\n')
             disagreement_score = 0
@@ -123,7 +143,8 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
                 'sentiment_related': 'neutral',
                 'disagreement_level': 'medium' if disagreement_score > 50 else 'low',
                 'confidence': 50,
-                'analysis_summary': 'Partial analysis due to parsing issues'
+                'analysis_summary': 'Partial analysis due to parsing issues',
+                'reason': 'Could not parse full GPT response, extracted disagreement score only'
             }
             
     except Exception as e:
@@ -134,7 +155,8 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
             'sentiment_related': 'neutral',
             'disagreement_level': 'unknown',
             'confidence': 0,
-            'analysis_summary': f'Analysis failed: {str(e)[:50]}...'
+            'analysis_summary': f'Analysis failed: {str(e)[:50]}...',
+            'reason': f'Sentiment analysis failed due to API error: {str(e)[:100]}'
         }
 
 
@@ -340,7 +362,6 @@ def find_related_news(keywords, publish_date, original_url=None, original_text=N
     params = {
         "apikey": settings.NEWS_API_KEY_2,
         "q": search_query,
-        # Removed 'size' parameter as it's not supported
     }
 
     print(f"🔍 Searching for related news with keywords: {selected_keywords}")
@@ -499,7 +520,7 @@ def generate_comparative_summary(original_article, related_articles):
     """Generate a comparative summary using ChatGPT for the original article and top disagreeing articles"""
     
     print(f"\n📝 Starting comparative summary generation...")
-    print(f"📰 Original article: {original_article.get('title', 'No title')[:50]}...")
+    print(f"📰 Original article: {original_article.get('title', 'No title')}...")
     print(f"📊 Related articles to analyze: {len(related_articles)}")
     
     if not related_articles:
@@ -518,6 +539,7 @@ def generate_comparative_summary(original_article, related_articles):
         title = article.get('title', f'Article {i}')
         sentiment = article.get('sentiment_analysis', {})
         disagreement_score = sentiment.get('disagreement_score', 0)
+        reason = sentiment.get('reason', 'No reason provided')
         
         # Get article content
         article_content = ""
@@ -533,31 +555,35 @@ def generate_comparative_summary(original_article, related_articles):
         else:
             article_content = f"{article.get('title', '')} {article.get('description', '')}"
         
-        articles_text += f"RELATED ARTICLE {i} (Disagreement Score: {disagreement_score}):\n"
+        articles_text += f"RELATED ARTICLE {i} (Disagreement Score: {disagreement_score}):\nReason: {reason}\n"
         articles_text += f"Title: {title}\n"
         articles_text += f"Content: {article_content}...\n\n"
     
     # Create comprehensive prompt for GPT-4
     prompt = f"""
-    Analyze and create a comparative summary of these news articles about the same topic. 
-    The articles are sorted by disagreement level (highest disagreement first).
+    Analyze and create a comparative analysis of these news articles about the same topic. 
+    The articles are sorted by disagreement level (highest disagreement first). Respond like a professional news analyst.
+    Do not respond like you are answering to a user, but rather as an expert analyzing the content. State that you are analyzing just the top 3 articles that disagree the most with the original article.
+    When referring to a specific article, if it is the original article, refer to it as "ORIGINAL ARTICLE". If it is not (a related article), refer to it with its title.
+
+    Here are the articles:
     
     {articles_text}
     
-    Please provide a comprehensive analysis in the following structure:
+    Please provide a neutral, unbiased analysis comparison in the following structure:
+
+    1. RELATED ARTICLES: List the titles of the related articles analyzed and their disagreement scores with the reasons for those scores.
     
-    1. OVERVIEW: A brief summary of what all articles are discussing
+    2. OVERVIEW: An analysis of what all articles are discussing
     
-    2. KEY DISAGREEMENTS: List the main points where articles disagree with each other
+    3. KEY DISAGREEMENTS: List the main points where articles disagree with each other (if there are any)
     
-    3. CONSENSUS POINTS: Points where most articles agree
+    4. CONSENSUS POINTS: Points where most articles agree
     
-    4. DIFFERENT PERSPECTIVES: How each article approaches the topic differently
-    
-    5. FACTUAL ACCURACY: Any factual inconsistencies between articles (if any)
-    
+    5. DIFFERENT PERSPECTIVES: How each article approaches the topic differently
+
     6. CONCLUSION: Your assessment of which perspective seems most balanced/credible
-    
+
     Keep the analysis objective and highlight the most significant differences in viewpoints.
     Format your response in clear sections as requested above.
     """
@@ -576,7 +602,7 @@ def generate_comparative_summary(original_article, related_articles):
         )
         
         summary_text = response.choices[0].message.content.strip()
-        print(f"✅ Comparative summary generated successfully")
+        print(f"✅ Comparative analysis generated successfully")
         print(f"📄 Summary length: {len(summary_text)} characters")
         
         # Parse the response into structured data
@@ -659,13 +685,13 @@ def analyze_news_url(url, manual_publish_date=None):
         keywords_list = keywords if isinstance(keywords, list) else [str(keywords)]
         print(f"🏷️  Keywords extracted: {keywords_list}")
         
-        # Find related news based on keywords and date with sentiment analysis
-        print(f"🔗 Finding related news with sentiment analysis...")
+        # Find related news based on keywords and date (no sentiment analysis for speed)
+        print(f"🔗 Finding related news...")
         related_news = find_related_news(
             keywords_list, 
             final_publish_date, 
             original_url=url,
-            original_text=article.text,  # Pass original text for sentiment analysis
+            original_text=None,  # Don't pass original text to skip sentiment analysis
             limit=10
         )
         
@@ -698,19 +724,19 @@ def analyze_news_url(url, manual_publish_date=None):
                 'target_date': final_publish_date.strftime('%Y-%m-%d') if final_publish_date else 'Unknown',
                 'date_range': 'Prioritized within ±3 days, bonus up to ±7 days',
                 'keywords_used': search_keywords_used,  # Show keywords actually used in search
-                'similarity_method': 'Advanced weighted scoring with full content + sentiment analysis',
+                'similarity_method': 'Advanced weighted scoring with full content',
                 'total_found': len(related_news),
                 'manual_date_override': f"Manual date: {manual_publish_date}" if manual_publish_date else "Auto-detected from article",
-                'has_sentiment_analysis': any(article.get('sentiment_analysis') for article in related_news),
-                'sorting_method': 'Disagreement level (highest first)' if any(article.get('sentiment_analysis') for article in related_news) else 'Similarity + Recency',
+                'has_sentiment_analysis': False,  # No sentiment analysis in initial fetch
+                'sorting_method': 'Similarity + Recency',  # Default sorting without sentiment
                 'scoring_details': {
                     'title_weight': '50%',
                     'description_weight': '20%',
                     'content_weight': '25%', 
                     'exact_match_bonus': '10%',
                     'date_bonus': '3-10 points (same day=10, ±1day=8, ±3days=5, ±7days=3)',
-                    'sentiment_analysis': 'Articles analyzed for disagreement and sorted by controversy level',
-                    'method': 'Full article content + sentiment disagreement analysis'
+                    'sentiment_analysis': 'Available via AI Comparison button',
+                    'method': 'Full article content analysis (fast mode)'
                 }
             }
         }
@@ -850,9 +876,11 @@ def ai_comparison_api(request):
             'url': article_url
         }
         
-        # Convert related articles to proper format
+        # Convert related articles to proper format and add sentiment analysis
         formatted_related_articles = []
-        for article in related_articles:
+        print(f"🎭 Starting sentiment analysis for AI comparison...")
+        
+        for i, article in enumerate(related_articles):
             formatted_article = {
                 'title': article.get('title', ''),
                 'link': article.get('link', ''),
@@ -861,7 +889,48 @@ def ai_comparison_api(request):
                 'pubDate': article.get('pubDate', ''),
                 'similarity_score': article.get('similarity_score', 0)
             }
+            
+            # Perform sentiment analysis for AI comparison
+            if article_text:  # Only if we have original article text
+                try:
+                    print(f"   🎭 Analyzing article {i+1}/{len(related_articles)}: {article.get('title', '')[:40]}...")
+                    
+                    # Use simplified keywords for sentiment analysis
+                    keywords = [article_title] if article_title else []
+                    sentiment_data = analyze_sentiment_disagreement(article_text, formatted_article, keywords)
+                    
+                    if sentiment_data:
+                        formatted_article['sentiment_analysis'] = sentiment_data
+                        formatted_article['disagreement_score'] = sentiment_data.get('disagreement_score', 50)
+                        reason = sentiment_data.get('reason', 'No reason provided')
+                        print(f"      ✅ Disagreement score: {sentiment_data.get('disagreement_score', 50)}%")
+                        print(f"      💭 Reason: {reason}...")
+                        print(f"      🎭 Sentiments: {sentiment_data.get('sentiment_original', 'neutral')} vs {sentiment_data.get('sentiment_related', 'neutral')}")
+                    else:
+                        formatted_article['disagreement_score'] = 50
+                        print(f"      ⚠️ Using default neutral score")
+                        
+                except Exception as e:
+                    print(f"      ❌ Sentiment analysis failed: {str(e)[:50]}...")
+                    print(f"      🔄 Using default disagreement score of 50%")
+                    formatted_article['disagreement_score'] = 50
+                    formatted_article['sentiment_analysis'] = {
+                        'disagreement_score': 50,
+                        'sentiment_original': 'neutral',
+                        'sentiment_related': 'neutral',
+                        'disagreement_level': 'medium',
+                        'confidence': 0,
+                        'analysis_summary': 'Analysis failed',
+                        'reason': f'Sentiment analysis failed: {str(e)[:100]}'
+                    }
+            else:
+                formatted_article['disagreement_score'] = 50
+            
             formatted_related_articles.append(formatted_article)
+        
+        # Sort by disagreement score for AI comparison
+        formatted_related_articles.sort(key=lambda x: x.get('disagreement_score', 50), reverse=True)
+        print(f"   📊 Articles sorted by disagreement for AI comparison")
         
         # Use existing generate_comparative_summary function
         comparative_summary = generate_comparative_summary(
