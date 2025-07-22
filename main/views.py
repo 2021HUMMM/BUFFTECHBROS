@@ -11,16 +11,12 @@ from newspaper import Article
 
 # Page Navigator
 
-def main_redirect(request):
+def main_page(request):
     # Redirect based on authentication status
     if request.user.is_authenticated:
         return redirect('main:show_main')
     else:
         return render(request, 'landing.html')
-
-def landing_page(request):
-    return render(request, 'landing.html')
-
 
 def show_main(request):
     news_article = Article("https://cenderawasihpos.jawapos.com/metropolis/22/07/2025/pastikan-program-mbg-harus-berkelanjutan/")

@@ -4,7 +4,7 @@
       
       <!-- Left: Verifai Logo -->
       <div class="flex-shrink-0">
-        <a href="{% url 'main:landing_page' %}" class="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
+        <a href="{% url 'main:main_page' %}" class="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
           <!-- Logo placeholder -->
           <img 
             src="https://i.imgur.com/FO7o7P5.png" 
@@ -19,8 +19,8 @@
       <div class="hidden md:block">
         <div class="ml-10 flex items-baseline space-x-4">
           <a 
-            href="{% url 'main:landing_page' %}" 
-            class="{% if request.resolver_match.view_name == 'main:landing_page' %}bg-blue-100 text-blue-700{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
+            href="{% url 'main:main_page' %}" 
+            class="{% if request.resolver_match.view_name == 'main:main_page' %}bg-blue-100 text-blue-700{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
             </svg>
@@ -137,8 +137,8 @@
   <div class="md:hidden hidden" id="mobile-menu">
     <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50">
       <a 
-        href="{% url 'main:landing_page' %}" 
-        class="{% if request.resolver_match.view_name == 'main:landing_page' %}bg-blue-100 text-blue-700{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} block px-3 py-2 rounded-md text-base font-medium">
+        href="{% url 'main:main_page' %}" 
+        class="{% if request.resolver_match.view_name == 'main:main_page' %}bg-blue-100 text-blue-700{% else %}text-gray-600 hover:text-blue-600 hover:bg-blue-50{% endif %} block px-3 py-2 rounded-md text-base font-medium">
         🏠 Home
       </a>
       <a 

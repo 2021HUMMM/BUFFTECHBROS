@@ -1,26 +1,48 @@
-<h1> SAYA SANGAT SUKA MEMBUAT APLIKASI DAN WEB :DD </h1>
-<!--for each news_data-->
-<button type="button" onclick="window.location.href='{% url 'authentication:logout' %}'">
-  Logout
-</button>
+{% extends 'base.html' %}
 
-<button type="button" onclick="window.location.href='{% url 'news_portal:show_news' %}'">
-  Show News
-</button>
+{% block content %}
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">SAYA SANGAT SUKA MEMBUAT APLIKASI DAN WEB :DD</h1>
+    
+    <!-- Quick Actions -->
+    <div class="mb-8">
+      <button type="button" 
+              onclick="window.location.href='{% url 'news_portal:show_news' %}'"
+              class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200 font-medium mr-4">
+        Show News
+      </button>
+    </div>
 
-<h2>Upload Image for OCR</h2>
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Process Image</button>
-</form>
+    <!-- OCR Section -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h2 class="text-2xl font-semibold text-gray-900 mb-4">Upload Image for OCR</h2>
+      <form method="post" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+        <div class="space-y-2">
+          {{ form.as_p }}
+        </div>
+        <button type="submit" 
+                class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-200 font-medium">
+          Process Image
+        </button>
+      </form>
+    </div>
 
-{% if text_result %}
-  <h3>Extracted Text:</h3>
-  <pre>{{ text_result }}</pre>
-{% endif %}
+    <!-- Results Section -->
+    {% if text_result %}
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Extracted Text:</h3>
+        <pre class="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto">{{ text_result }}</pre>
+      </div>
+    {% endif %}
 
-{% if keywords %}
-    <h3>search query</h3>
-    <pre>{{ keywords }}</pre>
-{% endif %}
+    {% if keywords %}
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Search Query:</h3>
+        <pre class="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto">{{ keywords }}</pre>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
