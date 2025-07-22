@@ -155,7 +155,7 @@ def find_related_news(keywords, publish_date, limit=10):
         target_date = datetime.now()
     
     # Prepare search query from top keywords
-    top_keywords = keywords[:3] if len(keywords) >= 3 else keywords
+    top_keywords = keywords[:6] if len(keywords) >= 6 else keywords
     search_query = " OR ".join(top_keywords) if len(top_keywords) > 1 else top_keywords[0] if top_keywords else ""
     
     if not search_query:
@@ -173,6 +173,11 @@ def find_related_news(keywords, publish_date, limit=10):
     
     try:
         response = requests.get(url, params=params)
+
+        # check the ful request url
+        print(f"Request URL: {response.url}")
+
+
         response.raise_for_status()
         data = response.json()
         results = data.get("results", [])
@@ -217,9 +222,9 @@ def find_related_news(keywords, publish_date, limit=10):
             
             # Calculate similarity percentage
             similarity = (keyword_matches / len(keywords)) * 100 if keywords else 0
-            
-            # Only include articles with 50%+ similarity
-            if similarity >= 50:
+
+            # Only include articles with 30%+ similarity
+            if similarity >= 30:
                 article['similarity_score'] = similarity
                 filtered_results.append(article)
         
@@ -253,17 +258,16 @@ def analyze_news_url(url):
         return {
             'url': url,
             'title': article.title,
-            'summary': article.summary if hasattr(article, 'summary') else article.text[:200] + "...",
             'publish_date': article.publish_date,
-            'keywords': keywords_list[:10],  # Limit to top 10 keywords
+            'keywords': keywords_list[:6],  # Limit to top 10 keywords
             'text': article.text,
             'authors': article.authors,
             'related_news': related_news,
             'search_info': {
                 'target_date': article.publish_date.strftime('%Y-%m-%d') if article.publish_date else 'Unknown',
                 'date_range': '±1 day from publish date',
-                'keywords_used': keywords_list[:3],
-                'similarity_threshold': '50%',
+                'keywords_used': keywords_list[:6],
+                'similarity_threshold': '30%',
                 'total_found': len(related_news)
             }
         }
@@ -273,7 +277,6 @@ def analyze_news_url(url):
         return {
             'url': url,
             'title': 'Error analyzing article',
-            'summary': f'Could not analyze the article. Error: {str(e)}',
             'publish_date': None,
             'keywords': [],
             'text': '',
@@ -283,7 +286,7 @@ def analyze_news_url(url):
                 'target_date': 'Unknown',
                 'date_range': 'N/A',
                 'keywords_used': [],
-                'similarity_threshold': '50%',
+                'similarity_threshold': '30%',
                 'total_found': 0
             }
         }
