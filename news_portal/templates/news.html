@@ -203,6 +203,32 @@
         <!-- URL Analysis Results -->
         {% if analyzed_article %}
         <div id="analysisResultsContainer" class="bg-white border border-indigo-200 rounded-lg shadow-lg mb-8 p-6 relative">
+          {% csrf_token %}
+          <script>
+            // Store analysis data globally for JavaScript access
+            window.currentAnalysisData = {
+              url: "{{ analyzed_article.url|escapejs }}",
+              title: "{{ analyzed_article.title|escapejs }}",
+              text: "{{ analyzed_article.text|escapejs }}",
+              related_news: []  // Will be populated by template data
+            };
+            
+            // Populate related news data from server
+            {% if analyzed_article.related_news %}
+            window.currentAnalysisData.related_news = [
+              {% for news in analyzed_article.related_news %}
+              {
+                title: "{{ news.title|escapejs }}",
+                link: "{{ news.link|escapejs }}",
+                description: "{{ news.description|default_if_none:""|escapejs }}",
+                source_id: "{{ news.source_id|default_if_none:""|escapejs }}",
+                pubDate: "{{ news.pubDate|escapejs }}",
+                similarity_score: {{ news.similarity_score|default:0 }}
+              }{% if not forloop.last %},{% endif %}
+              {% endfor %}
+            ];
+            {% endif %}
+          </script>
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-xl font-bold text-gray-900 flex items-center">
               <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,14 +236,23 @@
               </svg>
               Analysis Results
             </h3>
-            <button 
-              onclick="closeAnalysisResults()" 
-              class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-200"
-              title="Close analysis results">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
+            <div class="flex items-center space-x-3">
+              <!-- AI Comparison Button -->
+              <button onclick="generateAIComparison()" id="aiComparisonBtn" 
+                      class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2">
+                <i class="fas fa-brain"></i>
+                <span>AI Comparison</span>
+              </button>
+              <!-- Close Button -->
+              <button 
+                onclick="closeAnalysisResults()" 
+                class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-200"
+                title="Close analysis results">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
           </div>
           
           <div class="grid md:grid-cols-2 gap-6 mb-6">
@@ -258,12 +293,32 @@
           <!-- Related News -->
           {% if analyzed_article.related_news %}
           <div class="border-t border-gray-200 pt-6">
-            <h4 class="text-lg font-semibold text-gray-900 mb-4">Related Articles ({{ analyzed_article.related_news|length }})</h4>
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              Related Articles ({{ analyzed_article.related_news|length }})
+              {% if analyzed_article.related_news.0.sentiment_analysis %}
+              <span class="ml-2 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">Sorted by Disagreement</span>
+              {% endif %}
+            </h4>
             <div class="grid md:grid-cols-2 gap-4">
               {% for news in analyzed_article.related_news %}
               <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:border-indigo-200 transition-colors">
-                <h6 class="font-medium text-gray-900 text-sm mb-2">{{ news.title }}</h6>
+                <div class="flex items-start justify-between mb-2">
+                  <h6 class="font-medium text-gray-900 text-sm flex-1">{{ news.title }}</h6>
+                  <div class="ml-2 flex flex-col gap-1">
+                    <span class="px-2 py-1 text-xs bg-indigo-100 text-indigo-700 rounded-full">
+                      Similarity: {{ news.similarity_score|floatformat:1 }}
+                    </span>
+                    {% if news.disagreement_score %}
+                    <span class="px-2 py-1 text-xs {% if news.disagreement_score >= 70 %}bg-red-100 text-red-700{% elif news.disagreement_score >= 40 %}bg-orange-100 text-orange-700{% else %}bg-green-100 text-green-700{% endif %} rounded-full">
+                      {{ news.disagreement_score|floatformat:1 }}% disagreement
+                    </span>
+                    {% endif %}
+                  </div>
+                </div>
                 <p class="text-gray-600 text-xs mb-3">{{ news.description|default:"No description available"|truncatewords:15 }}</p>
+                {% if news.sentiment_analysis.analysis_summary %}
+                <p class="text-xs text-purple-700 mb-2 italic bg-purple-50 p-2 rounded">"{{ news.sentiment_analysis.analysis_summary|truncatewords:20 }}"</p>
+                {% endif %}
                 <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
                   <span>{{ news.source_id|default:"Unknown" }}</span>
                   <span>{{ news.pubDate|slice:":10" }}</span>
@@ -456,6 +511,175 @@
         window.history.replaceState({}, '', url.toString());
       }, 300);
     }
+  }
+
+  // AI Comparison function
+  function generateAIComparison() {
+    const button = document.getElementById('aiComparisonBtn');
+    const originalText = button.innerHTML;
+    
+    // Get analysis data from page data
+    const hasAnalysisData = document.getElementById('analysisResultsContainer') !== null;
+    
+    if (!hasAnalysisData) {
+      alert('No article data available for comparison');
+      return;
+    }
+    
+    // Check if data exists
+    if (!window.currentAnalysisData || !window.currentAnalysisData.related_news || window.currentAnalysisData.related_news.length === 0) {
+      alert('No related articles found for comparison');
+      return;
+    }
+    
+    // Show loading state
+    button.innerHTML = '<i class="fas fa-spinner animate-spin"></i><span>Generating...</span>';
+    button.disabled = true;
+    
+    // Create or update AI comparison container
+    let comparisonContainer = document.getElementById('aiComparisonContainer');
+    if (!comparisonContainer) {
+      comparisonContainer = document.createElement('div');
+      comparisonContainer.id = 'aiComparisonContainer';
+      comparisonContainer.className = 'border-t border-gray-200 pt-6 mt-6';
+      document.getElementById('analysisResultsContainer').appendChild(comparisonContainer);
+    }
+    
+    // Show initial loading message
+    comparisonContainer.innerHTML = `
+      <div class="text-center py-8">
+        <div class="animate-spin h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+        <p class="text-gray-600">Generating AI comparison analysis...</p>
+        <p class="text-sm text-gray-500 mt-2">Analyzing ${window.currentAnalysisData.related_news.length} related articles</p>
+      </div>
+    `;
+    
+    // Simulate AI processing for now
+    // Make actual API call to Django backend
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+    
+    fetch('/analyzer/ai_comparison/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
+      },
+      body: JSON.stringify({
+        article_url: window.currentAnalysisData.url,
+        article_title: window.currentAnalysisData.title,
+        article_text: window.currentAnalysisData.text,
+        related_articles: window.currentAnalysisData.related_news
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.comparison) {
+        const result = data.comparison;
+        
+        // Display results
+        comparisonContainer.innerHTML = `
+          <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            AI Comparative Analysis
+            <span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+              ${result.articles_analyzed || window.currentAnalysisData.related_news.length} Articles Analyzed
+            </span>
+          </h4>
+          
+          <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+            <div class="prose prose-sm max-w-none">
+              ${result.sections ? Object.entries(result.sections).map(([title, content]) => `
+                <div class="mb-4">
+                  <h5 class="font-semibold text-gray-900 mb-2">${title}</h5>
+                  <div class="text-gray-700 text-sm whitespace-pre-line">${content}</div>
+                </div>
+              `).join('') : `
+                <div class="text-gray-700 text-sm whitespace-pre-line">${result.full_summary || result.summary || 'Analysis completed successfully.'}</div>
+              `}
+            </div>
+            ${result.highest_disagreement_score && result.highest_disagreement_score > 0 ? `
+              <div class="mt-4 pt-4 border-t border-indigo-200">
+                <div class="flex items-center text-xs text-gray-600">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Highest disagreement score: ${result.highest_disagreement_score}%
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+        
+        // Reset button
+        button.innerHTML = originalText;
+        button.disabled = false;
+        
+      } else {
+        throw new Error(data.error || 'Analysis failed');
+      }
+    })
+    .catch(error => {
+      console.error('AI Comparison error:', error);
+      
+      // Show error with fallback to mock data
+      comparisonContainer.innerHTML = `
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+          <div class="flex items-center text-yellow-800">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.08 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <span class="font-medium">AI Service Unavailable</span>
+          </div>
+          <p class="text-yellow-700 text-sm mt-2">Showing basic analysis instead: ${error.message}</p>
+        </div>
+        
+        <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          Basic Analysis Summary
+          <span class="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+            ${window.currentAnalysisData.related_news.length} Articles Found
+          </span>
+        </h4>
+        
+        <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+          <div class="prose prose-sm max-w-none">
+            <div class="text-gray-700 text-sm">
+              Found ${window.currentAnalysisData.related_news.length} related articles about "${window.currentAnalysisData.title}".
+              <br><br>
+              <strong>Article Sources:</strong><br>
+              ${window.currentAnalysisData.related_news.map(article => `• ${article.source_id || 'Unknown source'}`).join('<br>')}
+              <br><br>
+              <strong>Coverage Period:</strong><br>
+              Articles span from various dates, showing ongoing coverage of this topic.
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Reset button
+      button.innerHTML = originalText;
+      button.disabled = false;
+    });
+  }
+
+  // Helper function to get CSRF token
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
   }
 
   // Keyboard shortcut to close analysis (Escape key)
