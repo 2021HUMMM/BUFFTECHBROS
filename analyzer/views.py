@@ -99,10 +99,21 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
         
         # Clean response text - remove markdown code blocks if present
         cleaned_response = response_text
-        if cleaned_response.startswith('```json'):
-            cleaned_response = cleaned_response.replace('```json', '', 1)
-        if cleaned_response.endswith('```'):
-            cleaned_response = cleaned_response.rsplit('```', 1)[0]
+        
+        # More robust cleaning for markdown code blocks
+        if '```json' in cleaned_response:
+            # Find and remove the opening ```json
+            start_index = cleaned_response.find('```json')
+            if start_index != -1:
+                cleaned_response = cleaned_response[start_index + 7:]  # Remove '```json'
+        
+        if '```' in cleaned_response:
+            # Find and remove the closing ```
+            end_index = cleaned_response.rfind('```')
+            if end_index != -1:
+                cleaned_response = cleaned_response[:end_index]
+        
+        # Remove any remaining markdown artifacts
         cleaned_response = cleaned_response.strip()
         
         print(f"     🧹 Cleaned response: {cleaned_response[:100]}...")
@@ -121,10 +132,13 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
             print(f"        📝 Reason: {sentiment_data.get('reason', 'No reason provided')}...")
             return sentiment_data
             
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
             print(f"     ❌ Failed to parse JSON response, extracting manually...")
-            print(f"     🔍 Full response for debugging: {response_text}")
-            print(f"     🧹 Cleaned response for debugging: {cleaned_response}")
+            print(f"     🔍 JSON Error: {str(e)}")
+            print(f"     📄 Full response for debugging:")
+            print(f"     {response_text}")
+            print(f"     🧹 Cleaned response for debugging:")
+            print(f"     {cleaned_response}")
             
             # Fallback parsing
             lines = response_text.split('\n')
@@ -616,7 +630,7 @@ def generate_comparative_summary(original_article, related_articles):
                 continue
                 
             # Check if this line is a section header
-            if any(header in line.upper() for header in ['OVERVIEW', 'KEY DISAGREEMENTS', 'CONSENSUS POINTS', 'DIFFERENT PERSPECTIVES', 'FACTUAL ACCURACY', 'CONCLUSION']):
+            if any(header in line.upper() for header in ['RELATED ARTICLES', 'OVERVIEW', 'KEY DISAGREEMENTS', 'CONSENSUS POINTS', 'DIFFERENT PERSPECTIVES', 'FACTUAL ACCURACY', 'CONCLUSION']):
                 # Save previous section
                 if current_section and current_content:
                     sections[current_section] = '\n'.join(current_content)
