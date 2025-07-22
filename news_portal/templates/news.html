@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
   <!-- Main Content dengan Layout Sidebar -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -11,8 +11,8 @@
         <div class="sticky top-8 space-y-6">
           
           <!-- URL Analysis Card -->
-          <div class="bg-white border border-gray-100 overflow-hidden">
-            <div class="bg-black p-4">
+          <div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-indigo-600 p-4">
               <h3 class="text-white font-bold text-lg flex items-center">
                 <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
@@ -37,7 +37,7 @@
                   name="news_url"
                   value="{{ request.GET.news_url }}"
                   placeholder="https://example.com/news-article"
-                  class="w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 text-sm"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                 >
               </div>
               
@@ -51,19 +51,19 @@
                     type="date" 
                     name="publish_date"
                     value="{{ request.GET.publish_date }}"
-                    class="w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 text-sm"
+                    class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                   >
                   <div class="flex gap-1">
                     <button 
                       type="button"
                       onclick="this.form.publish_date.value = new Date().toISOString().split('T')[0]"
-                      class="flex-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs hover:bg-gray-200 transition-colors">
+                      class="flex-1 px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded hover:bg-indigo-200 transition-colors">
                       Today
                     </button>
                     <button 
                       type="button"
                       onclick="this.form.publish_date.value = ''"
-                      class="flex-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs hover:bg-gray-200 transition-colors">
+                      class="flex-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200 transition-colors">
                       Clear
                     </button>
                   </div>
@@ -75,21 +75,21 @@
                 type="submit"
                 name="analyze_url"
                 value="1"
-                class="w-full bg-black text-white py-3 px-4 font-medium hover:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-400 transition-all duration-200">
+                class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 shadow-lg">
                 <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
                 Analyze Article
               </button>
               
-              <div class="text-xs text-gray-500 bg-gray-50 p-3">
+              <div class="text-xs text-gray-600 bg-indigo-50 border border-indigo-100 rounded-lg p-3">
                 💡 <strong>How it works:</strong> Paste any news URL and optionally set a target date. Our AI will extract keywords and find related articles using advanced similarity scoring.
               </div>
             </form>
           </div>
           
           <!-- Quick Stats Card -->
-          <div class="bg-white border border-gray-100 p-4">
+          <div class="bg-white border border-gray-200 rounded-lg shadow-lg p-4">
             <h4 class="font-bold text-gray-900 mb-3 flex items-center">
               <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -120,7 +120,7 @@
         
 
         <!-- Search Section -->
-        <div class="bg-white border border-gray-100 mb-6">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-lg mb-6">
           <div class="px-6 py-8">
             <div class="text-center">
               <h2 class="text-2xl font-bold text-gray-900 mb-4">Search News</h2>
@@ -132,11 +132,11 @@
                     id="searchInput"
                     value="{{ request.GET.search }}"
                     placeholder="Search for news articles, topics, or sources... (Ctrl+K)"
-                    class="w-full px-6 py-4 text-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 placeholder-gray-400"
+                    class="w-full px-6 py-4 text-lg border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400"
                   >
                   <button 
                     type="submit"
-                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black hover:bg-gray-800 text-white p-3 transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-gray-400">
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
@@ -148,28 +148,28 @@
                     type="submit" 
                     name="category"
                     value=""
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200 {% if not request.GET.category %}bg-black text-white{% endif %}">
+                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if not request.GET.category %}bg-indigo-600 text-white{% endif %}">
                     All News
                   </button>
                   <button 
                     type="submit" 
                     name="category"
                     value="technology"
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200 {% if request.GET.category == 'technology' %}bg-black text-white{% endif %}">
+                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'technology' %}bg-indigo-600 text-white{% endif %}">
                     Technology
                   </button>
                   <button 
                     type="submit" 
                     name="category"
                     value="business"
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200 {% if request.GET.category == 'business' %}bg-black text-white{% endif %}">
+                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'business' %}bg-indigo-600 text-white{% endif %}">
                     Business
                   </button>
                   <button 
                     type="submit" 
                     name="category"
                     value="politics"
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200 {% if request.GET.category == 'politics' %}bg-black text-white{% endif %}">
+                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'politics' %}bg-indigo-600 text-white{% endif %}">
                     Politics
                   </button>
                 </div>
@@ -184,7 +184,7 @@
           <!-- Loading Indicator -->
           <div id="loadingIndicator" class="hidden">
             <div class="flex items-center justify-center py-8">
-              <div class="animate-spin h-12 w-12 border-b-2 border-black"></div>
+              <div class="animate-spin h-12 w-12 border-b-2 border-indigo-600"></div>
               <span class="ml-3 text-gray-600">Searching news...</span>
             </div>
           </div>
@@ -196,120 +196,70 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
               <span id="searchInfoText"></span>
-              <button id="clearFilters" class="ml-4 text-black hover:text-gray-700 text-sm font-medium">Clear filters</button>
+              <button id="clearFilters" class="ml-4 text-indigo-600 hover:text-indigo-800 text-sm font-medium">Clear filters</button>
             </div>
           </div>
 
         <!-- URL Analysis Results -->
         {% if analyzed_article %}
-        <div class="bg-white border border-gray-100 p-6 mb-8 animate-fade-in">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center">
-              <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <h3 class="text-xl font-bold text-gray-900">Analysis Complete</h3>
-            </div>
-            <span class="px-3 py-1 bg-gray-100 text-gray-800 text-sm font-medium">
-              {{ analyzed_article.related_news|length }} Related Articles Found
-            </span>
-          </div>
+        <div class="bg-white border border-indigo-200 rounded-lg shadow-lg mb-8 p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Analysis Results
+          </h3>
           
           <div class="grid md:grid-cols-2 gap-6 mb-6">
             <!-- Article Info -->
             <div class="space-y-4">
               <div>
-                <h4 class="font-semibold text-gray-900 mb-2 text-lg">{{ analyzed_article.title }}</h4>
-                <p class="text-gray-600 text-sm leading-relaxed">{{ analyzed_article.summary|truncatewords:30 }}</p>
+                <h4 class="font-semibold text-gray-900 mb-2">{{ analyzed_article.title }}</h4>
+                <p class="text-gray-600 text-sm">{{ analyzed_article.summary|truncatewords:30 }}</p>
               </div>
               
-              <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                <div class="flex items-center">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  {{ analyzed_article.publish_date|default:"Unknown Date" }}
-                </div>
+              <div class="flex items-center gap-4 text-sm text-gray-500">
+                <span>📅 {{ analyzed_article.publish_date|default:"Unknown Date" }}</span>
                 {% if analyzed_article.authors %}
-                <div class="flex items-center">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                  </svg>
-                  {{ analyzed_article.authors|join:", "|truncatewords:3 }}
-                </div>
+                <span>👤 {{ analyzed_article.authors|join:", "|truncatewords:3 }}</span>
                 {% endif %}
               </div>
               
-              <a href="{{ analyzed_article.url }}" target="_blank" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                </svg>
-                View Original Article
+              <a href="{{ analyzed_article.url }}" target="_blank" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium">
+                Read Original Article →
               </a>
             </div>
             
-            <!-- Keywords & Search Info -->
+            <!-- Keywords -->
             <div class="space-y-4">
               <div>
-                <h5 class="font-semibold text-gray-900 mb-3 flex items-center">
-                  <svg class="w-5 h-5 mr-2 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"></path>
-                  </svg>
-                  Key Topics
-                </h5>
+                <h5 class="font-semibold text-gray-900 mb-3">Keywords Found</h5>
                 <div class="flex flex-wrap gap-2">
                   {% for keyword in analyzed_article.keywords %}
-                  <span class="inline-flex items-center px-3 py-1 text-xs font-medium bg-gray-100 text-gray-800">
-                    {{ keyword }}
-                  </span>
+                  <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">{{ keyword }}</span>
                   {% empty %}
                   <span class="text-gray-500 text-sm">No keywords extracted</span>
                   {% endfor %}
                 </div>
               </div>
-              
-              <div class="bg-gray-50 p-4">
-                <h6 class="font-medium text-gray-900 mb-2">Search Information</h6>
-                <div class="space-y-1 text-xs text-gray-600">
-                  <div>🎯 Target Date: {{ analyzed_article.search_info.target_date }}</div>
-                  <div>📅 Date Range: {{ analyzed_article.search_info.date_range }}</div>
-                  <div>🔍 Keywords Used: {{ analyzed_article.search_info.keywords_used|join:", " }}</div>
-                  <div>📊 Method: {{ analyzed_article.search_info.method|default:"Advanced AI Analysis" }}</div>
-                </div>
-              </div>
             </div>
           </div>
           
-          <!-- Related News Section -->
+          <!-- Related News -->
           {% if analyzed_article.related_news %}
           <div class="border-t border-gray-200 pt-6">
-            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <svg class="w-5 h-5 mr-2 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
-              </svg>
-              Related News Articles
-            </h4>
-            <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-4">
+            <h4 class="text-lg font-semibold text-gray-900 mb-4">Related Articles ({{ analyzed_article.related_news|length }})</h4>
+            <div class="grid md:grid-cols-2 gap-4">
               {% for news in analyzed_article.related_news %}
-              <div class="bg-gray-50 p-4 border border-gray-100 hover:border-gray-200 transition-all duration-200">
-                <div class="flex items-start justify-between mb-2">
-                  <h6 class="font-medium text-gray-900 text-sm line-clamp-2 flex-1">{{ news.title }}</h6>
-                  {% if news.similarity_score %}
-                  <span class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full flex-shrink-0">
-                    {{ news.similarity_score }}%
-                  </span>
-                  {% endif %}
-                </div>
-                <p class="text-gray-600 text-xs mb-3 line-clamp-2">{{ news.description|default:"No description available" }}</p>
+              <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:border-indigo-200 transition-colors">
+                <h6 class="font-medium text-gray-900 text-sm mb-2">{{ news.title }}</h6>
+                <p class="text-gray-600 text-xs mb-3">{{ news.description|default:"No description available"|truncatewords:15 }}</p>
                 <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
-                  <span class="font-medium">{{ news.source_id|default:"Unknown" }}</span>
+                  <span>{{ news.source_id|default:"Unknown" }}</span>
                   <span>{{ news.pubDate|slice:":10" }}</span>
                 </div>
-                <a href="{{ news.link }}" target="_blank" class="inline-flex items-center text-blue-600 hover:text-blue-800 text-xs font-medium">
-                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                  </svg>
-                  Read More
+                <a href="{{ news.link }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">
+                  Read More →
                 </a>
               </div>
               {% endfor %}
@@ -318,11 +268,8 @@
           {% else %}
           <div class="border-t border-gray-200 pt-6">
             <div class="text-center text-gray-500 py-8">
-              <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-              </svg>
               <h5 class="text-lg font-medium text-gray-400 mb-2">No Related Articles Found</h5>
-              <p class="text-sm text-gray-400">Try adjusting the target date or check back later for more articles.</p>
+              <p class="text-sm text-gray-400">Try adjusting the target date or check back later.</p>
             </div>
           </div>
           {% endif %}
@@ -341,7 +288,7 @@
               </svg>
               <h3 class="text-xl font-medium text-gray-400 mb-2">No News Articles Found</h3>
               <p class="text-gray-400 mb-6">Try searching for different keywords or check back later.</p>
-              <button onclick="window.location.reload()" class="bg-black text-white px-6 py-2 hover:bg-gray-800 transition-colors">
+              <button onclick="window.location.reload()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg">
                 Refresh Page
               </button>
             </div>
@@ -456,29 +403,6 @@
       }
     });
 
-    // Clear search when Escape is pressed
-    searchInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        this.value = '';
-        performSearch('', currentCategory);
-      }
-    });
-
-    // Real-time search with debouncing
-    searchInput.addEventListener('input', function(e) {
-      const query = e.target.value;
-      
-      // Clear previous timeout
-      if (searchTimeout) {
-        clearTimeout(searchTimeout);
-      }
-      
-      // Set new timeout for 500ms delay
-      searchTimeout = setTimeout(() => {
-        performSearch(query, currentCategory);
-      }, 500);
-    });
-
     // Category button handlers
     document.querySelectorAll('.category-btn').forEach(button => {
       button.addEventListener('click', function(e) {
@@ -502,41 +426,6 @@
         window.location.href = url.toString();
       });
     });
-
-    // Clear filters handler
-    document.addEventListener('click', function(e) {
-      if (e.target.id === 'clearFilters') {
-        clearFilters();
-      }
-    });
-
-    // Clear filters function
-    function clearFilters() {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('search');
-      url.searchParams.delete('category');
-      window.location.href = url.toString();
-    }
-
-    // URL Analysis handler - Remove the problematic code
-    // Form submission should work normally without AJAX interference
-    
-    // Handle analyze button click normally (remove AJAX override)
-    // Let the form submit naturally to the Django view
   });
-
-  function isValidUrl(string) {
-    try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function showErrorMessage(message) {
-    // Simple alert for now - you can implement toast notification later
-    alert(message);
-  }
 </script>
 {% endblock content %}
