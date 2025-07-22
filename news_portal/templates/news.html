@@ -11,15 +11,6 @@
             <span class="text-blue-600">📰</span> Trending News
           </h1>
         </div>
-        <button 
-          type="button" 
-          onclick="window.location.href='{% url 'main:show_main' %}'"
-          class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 shadow-lg">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-          </svg>
-          Home
-        </button>
       </div>
     </div>
   </div>
@@ -360,13 +351,13 @@
   </div>
 
   <!-- Footer -->
-  <footer class="bg-white border-t border-gray-200 mt-16">
+  {% comment %} <footer class="bg-white border-t border-gray-200 mt-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="text-center text-gray-500 text-sm">
         <p>&copy; 2025 BuffTechBros News Portal. Stay informed, stay ahead.</p>
       </div>
     </div>
-  </footer>
+  </footer> {% endcomment %}
 </div>
 
 <style>
