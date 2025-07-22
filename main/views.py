@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from newsapi import NewsApiClient
+# from newsapi import NewsApiClient
 from django.conf import settings
 from easyocr import Reader
 from PIL import Image
