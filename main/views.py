@@ -58,23 +58,3 @@ def show_main(request):
     }
 
     return render(request, 'main.html', context)
-
-def test_chat(request):
-    reply = None
-    user_input = None
-
-    if request.method == 'POST':
-        user_input = request.POST.get('message')
-        if user_input:
-            response = client.chat.completions.create(
-                model="gpt-4o",  # atau "gpt-3.5-turbo"
-                messages=[
-                    {"role": "user", "content": user_input}
-                ]
-            )
-            reply = response.choices[0].message.content
-
-    return render(request, 'test_chat.html', {
-        'user_input': user_input,
-        'reply': reply
-    })
