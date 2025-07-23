@@ -135,5 +135,3 @@ def get_news(topic):
     except requests.exceptions.RequestException as e:
         print("NewsData API Error:", e)
         return []
-
-

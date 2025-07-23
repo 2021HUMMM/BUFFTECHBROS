@@ -6,7 +6,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VerifAI - News Verification Platform</title>
+    <title>VerifAI - Platform Verifikasi Berita Berbasis AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
   </head>
@@ -17,17 +17,17 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
       <div class="text-center">
         <h1 class="text-5xl font-bold text-gray-900 mb-6">
-          Analyze News with <span class="text-indigo-600">AI Intelligence</span>
+          Analisis Berita dengan <span class="text-indigo-600">Kecerdasan AI</span>
         </h1>
         <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          Discover related articles, compare news coverage, and get comprehensive analysis 
-          from multiple sources using advanced AI technology. Perfect for researchers, journalists, and informed readers.
+          Temukan artikel terkait, bandingkan liputan berita, dan dapatkan analisis komprehensif 
+          dari berbagai sumber menggunakan teknologi AI canggih. Tingkatkan kritikalitas Anda terhadap media.
         </p>
         
         {% if not user.is_authenticated %}
         <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8 max-w-2xl mx-auto">
           <p class="text-amber-800 text-lg">
-            🔒 <strong>Login required</strong> to access News Analysis and AI Comparison features
+            🔒 <strong>Login diperlukan</strong> untuk mengakses fitur Analisis Berita dan Perbandingan AI
           </p>
         </div>
         {% endif %}
@@ -35,36 +35,13 @@
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           {% if user.is_authenticated %}
           <a href="{% url 'news_portal:show_news' %}" class="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition duration-200 shadow-lg">
-            Start Analyzing News
+            Mulai Analisis Berita
           </a>
           {% else %}
           <a href="{% url 'authentication:register' %}" class="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition duration-200 shadow-lg">
-            Get Started Free
-          </a>
-          <a href="{% url 'authentication:login' %}" class="border-2 border-indigo-600 text-indigo-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-50 transition duration-200">
-            Login
+            Mulai Gratis
           </a>
           {% endif %}
-        </div>
-
-        <!-- Demo Preview -->
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-4xl mx-auto">
-          <div class="bg-gray-50 rounded-lg p-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Try it now - Sample Analysis:</h3>
-            <div class="bg-white border border-gray-200 rounded-lg p-4 text-left">
-              <p class="text-gray-700">"Indonesia announces new economic policy to boost growth"</p>
-            </div>
-          </div>
-          <div class="grid md:grid-cols-2 gap-6 text-left">
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 class="font-semibold text-blue-800 mb-2">� Related Articles</h4>
-              <p class="text-blue-700 text-sm">Found 8 similar articles from various news sources</p>
-            </div>
-            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-              <h4 class="font-semibold text-green-800 mb-2">🤖 AI Analysis</h4>
-              <p class="text-green-700 text-sm">Comprehensive coverage summary and source comparison</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -73,8 +50,8 @@
     <div id="features" class="bg-white py-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-gray-900 mb-4">Powerful Features</h2>
-          <p class="text-xl text-gray-600">Everything you need to analyze news and understand coverage patterns</p>
+          <h2 class="text-4xl font-bold text-gray-900 mb-4">Fitur Utama</h2>
+          <p class="text-xl text-gray-600">Semua yang Anda butuhkan untuk menganalisis berita dan memahami pola liputan</p>
         </div>
 
         <div class="grid md:grid-cols-3 gap-8">
@@ -85,8 +62,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">URL Analysis</h3>
-            <p class="text-gray-600">Paste any news article URL to extract keywords, find related articles, and get comprehensive analysis from multiple sources.</p>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Analisis URL</h3>
+            <p class="text-gray-600">Tempel URL artikel berita apa pun untuk mengekstrak kata kunci, menemukan artikel terkait, dan mendapatkan analisis komprehensif dari berbagai sumber.</p>
           </div>
 
           <!-- AI Comparative Analysis -->
@@ -96,8 +73,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">AI Comparative Analysis</h3>
-            <p class="text-gray-600">Advanced AI compares articles across sources, identifies different perspectives, and highlights key disagreements or consensus points.</p>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Analisis Komparatif AI</h3>
+            <p class="text-gray-600">AI canggih membandingkan artikel lintas sumber, mengidentifikasi perspektif berbeda, dan menyoroti perbedaan utama atau titik konsensus.</p>
           </div>
 
           <!-- Image Text Extraction -->
@@ -107,8 +84,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2-2v12a2 2 0 002 2z"></path>
               </svg>
             </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">Image Text Extraction</h3>
-            <p class="text-gray-600">Upload screenshots from social media to automatically extract headlines using OpenAI Vision, then analyze coverage patterns.</p>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Ekstraksi Teks Gambar</h3>
+            <p class="text-gray-600">Unggah tangkapan layar dari media sosial untuk secara otomatis menganalisa kebenaran berita, kemudian analisis pola liputan.</p>
           </div>
         </div>
       </div>
@@ -118,46 +95,35 @@
     <div class="bg-gray-50 py-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
-          <p class="text-xl text-gray-600">Simple steps to analyze any news article</p>
+          <h2 class="text-4xl font-bold text-gray-900 mb-4">Cara Kerja</h2>
+          <p class="text-xl text-gray-600">Langkah sederhana untuk menganalisis artikel berita apa pun</p>
         </div>
 
         <div class="grid md:grid-cols-4 gap-8">
           <div class="text-center">
             <div class="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
-            <h3 class="text-lg font-semibold mb-2">Input Content</h3>
-            <p class="text-gray-600">Paste article URL or upload image screenshot</p>
+            <h3 class="text-lg font-semibold mb-2">Input Konten</h3>
+            <p class="text-gray-600">Tempel URL artikel atau unggah tangkapan layar gambar</p>
           </div>
           
           <div class="text-center">
             <div class="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">2</div>
-            <h3 class="text-lg font-semibold mb-2">AI Processing</h3>
-            <p class="text-gray-600">Extract keywords and find related articles automatically</p>
+            <h3 class="text-lg font-semibold mb-2">Pemrosesan AI</h3>
+            <p class="text-gray-600">Ekstrak kata kunci dan temukan artikel terkait secara otomatis</p>
           </div>
           
           <div class="text-center">
             <div class="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
-            <h3 class="text-lg font-semibold mb-2">Source Analysis</h3>
-            <p class="text-gray-600">Compare coverage across multiple news sources</p>
+            <h3 class="text-lg font-semibold mb-2">Analisis Sumber</h3>
+            <p class="text-gray-600">Bandingkan liputan di berbagai sumber berita</p>
           </div>
           
           <div class="text-center">
             <div class="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold">4</div>
-            <h3 class="text-lg font-semibold mb-2">Get Insights</h3>
-            <p class="text-gray-600">Detailed analysis with AI-powered comparisons</p>
+            <h3 class="text-lg font-semibold mb-2">Dapatkan Wawasan</h3>
+            <p class="text-gray-600">Analisis detail dengan perbandingan bertenaga AI</p>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- CTA Section -->
-    <div class="bg-indigo-600 py-16">
-      <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-white mb-4">Ready to Analyze News Like a Pro?</h2>
-        <p class="text-xl text-indigo-100 mb-8">Join researchers and journalists who use VerifAI for comprehensive news analysis</p>
-        <a href="{% url 'authentication:register' %}" class="bg-white text-indigo-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition duration-200 shadow-lg">
-          Start Analyzing Now
-        </a>
       </div>
     </div>
 

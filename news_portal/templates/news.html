@@ -7,8 +7,8 @@
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
       
       <!-- Sidebar Kiri - URL Analyzer -->
-      <div class="lg:col-span-1">
-        <div class="sticky top-8 space-y-6">
+      <div class="lg:col-span-1 h-full">
+        <div class="sticky top-8 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-gray-100 space-y-6 pr-2">
           
           <!-- URL Analysis Card -->
           <div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
@@ -19,7 +19,7 @@
                 </svg>
                 News Analyzer
               </h3>
-              <p class="text-gray-300 text-sm mt-1">Find related articles from any news URL</p>
+              <p class="text-gray-300 text-sm mt-1">Temukan artikel terkait dari URL berita apa pun</p>
             </div>
             
             <form method="POST" class="p-4 space-y-4" id="urlAnalysisForm">
@@ -28,7 +28,7 @@
               <!-- URL Input -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  📰 Article URL
+                  📰 URL Artikel
                 </label>
                 <input 
                   type="url" 
@@ -44,7 +44,7 @@
               <!-- Publish Date Input -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  📅 Target Date (optional)
+                  📅 Tanggal Target (opsional)
                 </label>
                 <div class="space-y-2">
                   <input 
@@ -59,13 +59,13 @@
                       type="button"
                       onclick="document.getElementById('urlPublishDate').value = new Date().toISOString().split('T')[0]"
                       class="flex-1 px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded hover:bg-indigo-200 transition-colors">
-                      Today
+                      Hari Ini
                     </button>
                     <button 
                       type="button"
                       onclick="document.getElementById('urlPublishDate').value = ''"
                       class="flex-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200 transition-colors">
-                      Clear
+                      Hapus
                     </button>
                   </div>
                 </div>
@@ -79,11 +79,11 @@
                 <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
-                <span id="analyzeUrlBtnText">Analyze Article</span>
+                <span id="analyzeUrlBtnText">Analisis Artikel</span>
               </button>
               
               <div class="text-xs text-gray-600 bg-indigo-50 border border-indigo-100 rounded-lg p-3">
-                💡 <strong>How it works:</strong> Paste any news URL and optionally set a target date. Our AI will extract keywords and find related articles using advanced similarity scoring.
+                💡 <strong>Cara kerja:</strong> Tempel URL berita apa pun dan atur tanggal target secara opsional. AI kami akan mengekstrak kata kunci dan menemukan artikel terkait menggunakan penilaian kesamaan canggih.
               </div>
             </form>
           </div>
@@ -95,9 +95,9 @@
                 <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
-                Image Analyzer
+                News Image Analyzer
               </h3>
-              <p class="text-gray-300 text-sm mt-1">Extract headlines from news images</p>
+              <p class="text-gray-300 text-sm mt-1">Ekstrak judul dari gambar berita</p>
             </div>
             
             <form method="POST" action="{% url 'analyzer:analyze_image_api' %}" enctype="multipart/form-data" class="p-4 space-y-4" id="imageAnalysisForm">
@@ -106,7 +106,7 @@
               <!-- Image Upload -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  🖼️ Upload News Image
+                  🖼️ Unggah Gambar Berita
                 </label>
                 <div class="relative">
                   <input 
@@ -119,7 +119,7 @@
                   >
                 </div>
                 <div class="mt-2 text-xs text-gray-500">
-                  Supported: JPG, PNG, GIF (max 10MB)
+                  Didukung: JPG, PNG, GIF (maks 10MB)
                 </div>
               </div>
               
@@ -136,7 +136,7 @@
               <!-- Target Date Input -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                  📅 Target Date (optional)
+                  📅 Tanggal Target (opsional)
                 </label>
                 <div class="space-y-2">
                   <input 
@@ -150,13 +150,13 @@
                       type="button"
                       onclick="document.getElementById('imagePublishDate').value = new Date().toISOString().split('T')[0]"
                       class="flex-1 px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded hover:bg-indigo-200 transition-colors">
-                      Today
+                      Hari Ini
                     </button>
                     <button 
                       type="button"
                       onclick="document.getElementById('imagePublishDate').value = ''"
                       class="flex-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200 transition-colors">
-                      Clear
+                      Hapus
                     </button>
                   </div>
                 </div>
@@ -170,11 +170,11 @@
                 <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
-                <span id="analyzeImageBtnText">Analyze Image</span>
+                <span id="analyzeImageBtnText">Analisis Gambar</span>
               </button>
               
               <div class="text-xs text-gray-600 bg-indigo-50 border border-indigo-100 rounded-lg p-3">
-                💡 <strong>How it works:</strong> Upload an image containing news headlines. Our AI will extract the text and find related articles using Vision API + keyword matching.
+                💡 <strong>Cara kerja:</strong> Unggah gambar yang berisi judul berita. AI kami akan mengekstrak teks dan menemukan artikel terkait menggunakan Vision API + pencocokan kata kunci.
               </div>
             </form>
           </div>
@@ -185,20 +185,20 @@
               <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
-              Today's Feed
+              Feed Hari Ini
             </h4>
             <div class="space-y-2 text-sm">
               <div class="flex justify-between">
-                <span class="text-gray-600">Total Articles:</span>
+                <span class="text-gray-600">Total Artikel:</span>
                 <span class="font-semibold text-gray-900">{{ trending_news|length }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">Categories:</span>
+                <span class="text-gray-600">Kategori:</span>
                 <span class="font-semibold text-gray-900">4</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">Last Updated:</span>
-                <span class="font-semibold text-gray-800">Just now</span>
+                <span class="text-gray-600">Terakhir Diperbarui:</span>
+                <span class="font-semibold text-gray-800">Baru saja</span>
               </div>
             </div>
           </div>
@@ -206,240 +206,246 @@
         </div>
       </div>
       
-      <!-- Main Content Area -->
-      <div class="lg:col-span-3">
-        
-        <!-- URL Analysis Results -->
-        {% if analyzed_article %}
-        <div id="analysisResultsContainer" class="bg-white border border-indigo-200 rounded-lg shadow-lg mb-8 p-6 relative">
-          {% csrf_token %}
-          <script>
-            // Store analysis data globally for JavaScript access
-            window.currentAnalysisData = {
-              url: "{{ analyzed_article.url|escapejs }}",
-              title: "{{ analyzed_article.title|escapejs }}",
-              text: "{{ analyzed_article.text|escapejs }}",
-              related_news: []  // Will be populated by template data
-            };
-            
-            // Populate related news data from server
-            {% if analyzed_article.related_news %}
-            window.currentAnalysisData.related_news = [
-              {% for news in analyzed_article.related_news %}
-              {
-                title: "{{ news.title|escapejs }}",
-                link: "{{ news.link|escapejs }}",
-                description: "{{ news.description|default_if_none:""|escapejs }}",
-                source_id: "{{ news.source_id|default_if_none:""|escapejs }}",
-                pubDate: "{{ news.pubDate|escapejs }}",
-                similarity_score: {{ news.similarity_score|default:0 }}
-              }{% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ];
-            {% endif %}
-          </script>
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl font-bold text-gray-900 flex items-center">
-              <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              Analysis Results
-            </h3>
-            <div class="flex items-center space-x-3">
-              <!-- AI Comparison Button -->
-              <button onclick="generateAIComparison()" id="aiComparisonBtn" 
-                      class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2">
-                <i class="fas fa-brain"></i>
-                <span>AI Comparison</span>
-              </button>
-              <!-- Close Button -->
-              <button 
-                onclick="closeAnalysisResults()" 
-                class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-200"
-                title="Close analysis results">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-          
-          <div class="grid md:grid-cols-2 gap-6 mb-6">
-            <!-- Article Info -->
-            <div class="space-y-4">
-              <div>
-                <h4 class="font-semibold text-gray-900 mb-2">{{ analyzed_article.title }}</h4>
-                <p class="text-gray-600 text-sm">{{ analyzed_article.summary|truncatewords:30 }}</p>
-              </div>
-              
-              <div class="flex items-center gap-4 text-sm text-gray-500">
-                <span>📅 {{ analyzed_article.publish_date|default:"Unknown Date" }}</span>
-                {% if analyzed_article.authors %}
-                <span>👤 {{ analyzed_article.authors|join:", "|truncatewords:3 }}</span>
-                {% endif %}
-              </div>
-              
-              <a href="{{ analyzed_article.url }}" target="_blank" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium">
-                Read Original Article →
-              </a>
-            </div>
-            
-            <!-- Keywords -->
-            <div class="space-y-4">
-              <div>
-                <h5 class="font-semibold text-gray-900 mb-3">Keywords Found</h5>
-                <div class="flex flex-wrap gap-2">
-                  {% for keyword in analyzed_article.keywords %}
-                  <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">{{ keyword }}</span>
-                  {% empty %}
-                  <span class="text-gray-500 text-sm">No keywords extracted</span>
-                  {% endfor %}
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Related News -->
-          {% if analyzed_article.related_news %}
-          <div class="border-t border-gray-200 pt-6">
-            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              Related Articles ({{ analyzed_article.related_news|length }})
-            </h4>
-            <div class="grid md:grid-cols-2 gap-4">
-              {% for news in analyzed_article.related_news %}
-              <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:border-indigo-200 transition-colors">
-                <div class="flex items-start justify-between mb-2">
-                  <h6 class="font-medium text-gray-900 text-sm flex-1">{{ news.title }}</h6>
-                  <div class="ml-2 flex flex-col gap-1">
-                    <span class="px-2 py-1 text-xs bg-indigo-100 text-indigo-700 rounded-full">
-                      Similarity: {{ news.similarity_score|floatformat:1 }}
-                    </span>
-                  </div>
-                </div>
-                <p class="text-gray-600 text-xs mb-3">{{ news.description|default:"No description available"|truncatewords:15 }}</p>
-                <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
-                  <span>{{ news.source_id|default:"Unknown" }}</span>
-                  <span>{{ news.pubDate|slice:":10" }}</span>
-                </div>
-                <a href="{{ news.link }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">
-                  Read More →
-                </a>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-          {% else %}
-          <div class="border-t border-gray-200 pt-6">
-            <div class="text-center text-gray-500 py-8">
-              <h5 class="text-lg font-medium text-gray-400 mb-2">No Related Articles Found</h5>
-              <p class="text-sm text-gray-400">Try adjusting the target date or check back later.</p>
-            </div>
-          </div>
-          {% endif %}
-        </div>
-        {% endif %}
+      <!-- Main Content Area - Now with independent scrolling -->
+      <div class="lg:col-span-3 h-full">
+        <div class="sticky top-8 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-gray-100 pr-2">
 
-        <!-- Search Section -->
-        <div class="bg-white border border-gray-200 rounded-lg shadow-lg mb-6">
-          <div class="px-6 py-8">
-            <div class="text-center">
-              <h2 class="text-2xl font-bold text-gray-900 mb-4">Search News</h2>
-              <form method="GET" action="{% url 'news_portal:show_news' %}" class="max-w-2xl mx-auto">
-                <div class="relative">
-                  <input 
-                    type="text" 
-                    name="search"
-                    id="searchInput"
-                    value="{{ request.GET.search }}"
-                    placeholder="Search for news articles, topics, or sources... (Ctrl+K)"
-                    class="w-full px-6 py-4 text-lg border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400"
-                  >
+          <!-- Main Content Area -->
+          <div class="lg:col-span-3">
+            
+            <!-- URL Analysis Results -->
+            {% if analyzed_article %}
+            <div id="analysisResultsContainer" class="bg-white border border-indigo-200 rounded-lg shadow-lg mb-8 p-6 relative">
+              {% csrf_token %}
+              <script>
+                // Store analysis data globally for JavaScript access
+                window.currentAnalysisData = {
+                  url: "{{ analyzed_article.url|escapejs }}",
+                  title: "{{ analyzed_article.title|escapejs }}",
+                  text: "{{ analyzed_article.text|escapejs }}",
+                  related_news: []  // Will be populated by template data
+                };
+                
+                // Populate related news data from server
+                {% if analyzed_article.related_news %}
+                window.currentAnalysisData.related_news = [
+                  {% for news in analyzed_article.related_news %}
+                  {
+                    title: "{{ news.title|escapejs }}",
+                    link: "{{ news.link|escapejs }}",
+                    description: "{{ news.description|default_if_none:""|escapejs }}",
+                    source_id: "{{ news.source_id|default_if_none:""|escapejs }}",
+                    pubDate: "{{ news.pubDate|escapejs }}",
+                    similarity_score: {{ news.similarity_score|default:0 }}
+                  }{% if not forloop.last %},{% endif %}
+                  {% endfor %}
+                ];
+                {% endif %}
+              </script>
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                  <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Analysis Results
+                </h3>
+                <div class="flex items-center space-x-3">
+                  <!-- AI Comparison Button -->
+                  <button onclick="generateAIComparison()" id="aiComparisonBtn" 
+                          class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2">
+                    <i class="fas fa-brain"></i>
+                    <span>Perbandingan AI</span>
+                  </button>
+                  <!-- Close Button -->
                   <button 
-                    type="submit"
-                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-lg">
+                    onclick="closeAnalysisResults()" 
+                    class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-200"
+                    title="Close analysis results">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                   </button>
                 </div>
+              </div>
+              
+              <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <!-- Article Info -->
+                <div class="space-y-4">
+                  <div>
+                    <h4 class="font-semibold text-gray-900 mb-2">{{ analyzed_article.title }}</h4>
+                    <p class="text-gray-600 text-sm">{{ analyzed_article.summary|truncatewords:30 }}</p>
+                  </div>
+                  
+                  <div class="flex items-center gap-4 text-sm text-gray-500">
+                    <span>📅 {{ analyzed_article.publish_date|default:"Unknown Date" }}</span>
+                    {% if analyzed_article.authors %}
+                    <span>👤 {{ analyzed_article.authors|join:", "|truncatewords:3 }}</span>
+                    {% endif %}
+                  </div>
+                  
+                  <a href="{{ analyzed_article.url }}" target="_blank" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium">
+                    Baca Artikel Asli →
+                  </a>
+                </div>
+                
+                <!-- Keywords -->
+                <div class="space-y-4">
+                  <div>
+                    <h5 class="font-semibold text-gray-900 mb-3">Kata Kunci Ditemukan</h5>
+                    <div class="flex flex-wrap gap-2">
+                      {% for keyword in analyzed_article.keywords %}
+                      <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">{{ keyword }}</span>
+                      {% empty %}
+                      <span class="text-gray-500 text-sm">Tidak ada kata kunci yang diekstrak</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Related News -->
+              {% if analyzed_article.related_news %}
+              <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  Artikel Terkait ({{ analyzed_article.related_news|length }})
+                </h4>
+                <div class="grid md:grid-cols-2 gap-4">
+                  {% for news in analyzed_article.related_news %}
+                  <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 hover:border-indigo-200 transition-colors">
+                    <div class="flex items-start justify-between mb-2">
+                      <h6 class="font-medium text-gray-900 text-sm flex-1">{{ news.title }}</h6>
+                      <div class="ml-2 flex flex-col gap-1">
+                        <span class="px-2 py-1 text-xs bg-indigo-100 text-indigo-700 rounded-full">
+                          Kesamaan: {{ news.similarity_score|floatformat:1 }}
+                        </span>
+                      </div>
+                    </div>
+                    <p class="text-gray-600 text-xs mb-3">{{ news.description|default:"Tidak ada deskripsi tersedia"|truncatewords:15 }}</p>
+                    <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+                      <span>{{ news.source_id|default:"Unknown" }}</span>
+                      <span>{{ news.pubDate|slice:":10" }}</span>
+                    </div>
+                    <a href="{{ news.link }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">
+                      Baca Lebih Lanjut →
+                    </a>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              {% else %}
+              <div class="border-t border-gray-200 pt-6">
+                <div class="text-center text-gray-500 py-8">
+                  <h5 class="text-lg font-medium text-gray-400 mb-2">Tidak Ada Artikel Terkait Ditemukan</h5>
+                  <p class="text-sm text-gray-400">Coba sesuaikan tanggal target atau periksa kembali nanti.</p>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+            {% endif %}
 
-                <div class="flex flex-wrap justify-center gap-2 mt-4">
-                  <button 
-                    type="submit" 
-                    name="category"
-                    value=""
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if not request.GET.category %}bg-indigo-600 text-white{% endif %}">
-                    All News
-                  </button>
-                  <button 
-                    type="submit" 
-                    name="category"
-                    value="technology"
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'technology' %}bg-indigo-600 text-white{% endif %}">
-                    Technology
-                  </button>
-                  <button 
-                    type="submit" 
-                    name="category"
-                    value="business"
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'business' %}bg-indigo-600 text-white{% endif %}">
-                    Business
-                  </button>
-                  <button 
-                    type="submit" 
-                    name="category"
-                    value="politics"
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'politics' %}bg-indigo-600 text-white{% endif %}">
-                    Politics
+            <!-- Search Section -->
+            <div class="bg-white border border-gray-200 rounded-lg shadow-lg mb-6">
+              <div class="px-6 py-8">
+                <div class="text-center">
+                  <h2 class="text-2xl font-bold text-gray-900 mb-4">Cari Berita</h2>
+                  <form method="GET" action="{% url 'news_portal:show_news' %}" class="max-w-2xl mx-auto">
+                    <div class="relative">
+                      <input 
+                        type="text" 
+                        name="search"
+                        id="searchInput"
+                        value="{{ request.GET.search }}"
+                        placeholder="Cari artikel berita, topik, atau sumber... (Ctrl+K)"
+                        class="w-full px-6 py-4 text-lg border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400"
+                      >
+                      <button 
+                        type="submit"
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-2 mt-4">
+                      <button 
+                        type="submit" 
+                        name="category"
+                        value=""
+                        class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if not request.GET.category %}bg-indigo-600 text-white{% endif %}">
+                        All News
+                      </button>
+                      <button 
+                        type="submit" 
+                        name="category"
+                        value="technology"
+                        class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'technology' %}bg-indigo-600 text-white{% endif %}">
+                        Technology
+                      </button>
+                      <button 
+                        type="submit" 
+                        name="category"
+                        value="business"
+                        class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'business' %}bg-indigo-600 text-white{% endif %}">
+                        Business
+                      </button>
+                      <button 
+                        type="submit" 
+                        name="category"
+                        value="politics"
+                        class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'politics' %}bg-indigo-600 text-white{% endif %}">
+                        Politics
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="space-y-6">
+        
+              <!-- Loading Indicator -->
+              <div id="loadingIndicator" class="hidden">
+                <div class="flex items-center justify-center py-8">
+                  <div class="animate-spin h-12 w-12 border-b-2 border-indigo-600"></div>
+                  <span class="ml-3 text-gray-600">Mencari berita...</span>
+                </div>
+              </div>
+
+              <!-- Search Results Info -->
+              <div id="searchInfo" class="search-info hidden">
+                <div class="flex items-center justify-center gap-2 text-gray-700">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span id="searchInfoText"></span>
+                  <button id="clearFilters" class="ml-4 text-indigo-600 hover:text-indigo-800 text-sm font-medium">Clear filters</button>
+                </div>
+              </div>
+
+            <!-- Main News Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {% for news in trending_news %}
+                {% include 'news_card.html' %}
+              {% empty %}
+              <div class="col-span-full">
+                <div class="text-center py-12">
+                  <svg class="w-20 h-20 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                  </svg>
+                  <h3 class="text-xl font-medium text-gray-400 mb-2">Tidak Ada Berita Ditemukan</h3>
+                  <p class="text-gray-400 mb-6">Coba cari dengan kata kunci yang berbeda atau periksa kembali nanti.</p>
+                  <button onclick="window.location.reload()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg">
+                    Refresh Page
                   </button>
                 </div>
-              </form>
+              </div>
+              {% endfor %}
+            </div>
+            
             </div>
           </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="space-y-6">
-    
-          <!-- Loading Indicator -->
-          <div id="loadingIndicator" class="hidden">
-            <div class="flex items-center justify-center py-8">
-              <div class="animate-spin h-12 w-12 border-b-2 border-indigo-600"></div>
-              <span class="ml-3 text-gray-600">Searching news...</span>
-            </div>
-          </div>
-
-          <!-- Search Results Info -->
-          <div id="searchInfo" class="search-info hidden">
-            <div class="flex items-center justify-center gap-2 text-gray-700">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <span id="searchInfoText"></span>
-              <button id="clearFilters" class="ml-4 text-indigo-600 hover:text-indigo-800 text-sm font-medium">Clear filters</button>
-            </div>
-          </div>
-
-        <!-- Main News Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {% for news in trending_news %}
-            {% include 'news_card.html' %}
-          {% empty %}
-          <div class="col-span-full">
-            <div class="text-center py-12">
-              <svg class="w-20 h-20 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
-              </svg>
-              <h3 class="text-xl font-medium text-gray-400 mb-2">No News Articles Found</h3>
-              <p class="text-gray-400 mb-6">Try searching for different keywords or check back later.</p>
-              <button onclick="window.location.reload()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg">
-                Refresh Page
-              </button>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-        
         </div>
       </div>
     </div>
