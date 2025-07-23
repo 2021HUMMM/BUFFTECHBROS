@@ -16,10 +16,7 @@ client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 # Page Navigator
 def main_page(request):
     # Redirect based on authentication status
-    if request.user.is_authenticated:
-        return redirect('main:show_main')
-    else:
-        return render(request, 'landing.html')
+    return render(request, 'landing.html')
 
 def show_main(request):
     text_result = None
