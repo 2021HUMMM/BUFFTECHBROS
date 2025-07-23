@@ -209,88 +209,6 @@
       <!-- Main Content Area -->
       <div class="lg:col-span-3">
         
-
-        <!-- Search Section -->
-        <div class="bg-white border border-gray-200 rounded-lg shadow-lg mb-6">
-          <div class="px-6 py-8">
-            <div class="text-center">
-              <h2 class="text-2xl font-bold text-gray-900 mb-4">Search News</h2>
-              <form method="GET" action="{% url 'news_portal:show_news' %}" class="max-w-2xl mx-auto">
-                <div class="relative">
-                  <input 
-                    type="text" 
-                    name="search"
-                    id="searchInput"
-                    value="{{ request.GET.search }}"
-                    placeholder="Search for news articles, topics, or sources... (Ctrl+K)"
-                    class="w-full px-6 py-4 text-lg border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400"
-                  >
-                  <button 
-                    type="submit"
-                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                  </button>
-                </div>
-
-                <div class="flex flex-wrap justify-center gap-2 mt-4">
-                  <button 
-                    type="submit" 
-                    name="category"
-                    value=""
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if not request.GET.category %}bg-indigo-600 text-white{% endif %}">
-                    All News
-                  </button>
-                  <button 
-                    type="submit" 
-                    name="category"
-                    value="technology"
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'technology' %}bg-indigo-600 text-white{% endif %}">
-                    Technology
-                  </button>
-                  <button 
-                    type="submit" 
-                    name="category"
-                    value="business"
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'business' %}bg-indigo-600 text-white{% endif %}">
-                    Business
-                  </button>
-                  <button 
-                    type="submit" 
-                    name="category"
-                    value="politics"
-                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'politics' %}bg-indigo-600 text-white{% endif %}">
-                    Politics
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="space-y-6">
-    
-          <!-- Loading Indicator -->
-          <div id="loadingIndicator" class="hidden">
-            <div class="flex items-center justify-center py-8">
-              <div class="animate-spin h-12 w-12 border-b-2 border-indigo-600"></div>
-              <span class="ml-3 text-gray-600">Searching news...</span>
-            </div>
-          </div>
-
-          <!-- Search Results Info -->
-          <div id="searchInfo" class="search-info hidden">
-            <div class="flex items-center justify-center gap-2 text-gray-700">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <span id="searchInfoText"></span>
-              <button id="clearFilters" class="ml-4 text-indigo-600 hover:text-indigo-800 text-sm font-medium">Clear filters</button>
-            </div>
-          </div>
-
         <!-- URL Analysis Results -->
         {% if analyzed_article %}
         <div id="analysisResultsContainer" class="bg-white border border-indigo-200 rounded-lg shadow-lg mb-8 p-6 relative">
@@ -420,6 +338,87 @@
           {% endif %}
         </div>
         {% endif %}
+
+        <!-- Search Section -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-lg mb-6">
+          <div class="px-6 py-8">
+            <div class="text-center">
+              <h2 class="text-2xl font-bold text-gray-900 mb-4">Search News</h2>
+              <form method="GET" action="{% url 'news_portal:show_news' %}" class="max-w-2xl mx-auto">
+                <div class="relative">
+                  <input 
+                    type="text" 
+                    name="search"
+                    id="searchInput"
+                    value="{{ request.GET.search }}"
+                    placeholder="Search for news articles, topics, or sources... (Ctrl+K)"
+                    class="w-full px-6 py-4 text-lg border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400"
+                  >
+                  <button 
+                    type="submit"
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-2 mt-4">
+                  <button 
+                    type="submit" 
+                    name="category"
+                    value=""
+                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if not request.GET.category %}bg-indigo-600 text-white{% endif %}">
+                    All News
+                  </button>
+                  <button 
+                    type="submit" 
+                    name="category"
+                    value="technology"
+                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'technology' %}bg-indigo-600 text-white{% endif %}">
+                    Technology
+                  </button>
+                  <button 
+                    type="submit" 
+                    name="category"
+                    value="business"
+                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'business' %}bg-indigo-600 text-white{% endif %}">
+                    Business
+                  </button>
+                  <button 
+                    type="submit" 
+                    name="category"
+                    value="politics"
+                    class="category-btn px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition-all duration-200 {% if request.GET.category == 'politics' %}bg-indigo-600 text-white{% endif %}">
+                    Politics
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="space-y-6">
+    
+          <!-- Loading Indicator -->
+          <div id="loadingIndicator" class="hidden">
+            <div class="flex items-center justify-center py-8">
+              <div class="animate-spin h-12 w-12 border-b-2 border-indigo-600"></div>
+              <span class="ml-3 text-gray-600">Searching news...</span>
+            </div>
+          </div>
+
+          <!-- Search Results Info -->
+          <div id="searchInfo" class="search-info hidden">
+            <div class="flex items-center justify-center gap-2 text-gray-700">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span id="searchInfoText"></span>
+              <button id="clearFilters" class="ml-4 text-indigo-600 hover:text-indigo-800 text-sm font-medium">Clear filters</button>
+            </div>
+          </div>
 
         <!-- Main News Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
