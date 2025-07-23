@@ -1028,10 +1028,7 @@ def analyze_ocr_text(ocr_text, manual_publish_date=None):
             limit=10
         )
         
-        # Generate summary of related articles instead of sentiment comparison
-        print(f"📄 Generating content summary for {len(related_news)} articles...")
-        content_summary = generate_ocr_content_summary(ocr_text, related_news, keywords_list)
-        
+        # Don't generate summary automatically - let user click button for AI analysis
         print(f"✅ OCR analysis completed!")
         print(f"📊 Results: {len(related_news)} related articles found")
         
@@ -1041,8 +1038,8 @@ def analyze_ocr_text(ocr_text, manual_publish_date=None):
             'target_date': target_date,
             'manual_date_used': manual_publish_date is not None,
             'related_news': related_news,
-            'content_summary': content_summary,
-            'analysis_type': 'OCR_CONTENT_SUMMARY',
+            'content_summary': None,  # Don't auto-generate, wait for user request
+            'analysis_type': 'OCR_ANALYSIS',
             'search_info': {
                 'target_date': target_date.strftime('%Y-%m-%d'),
                 'keywords_used': keywords_list[:6],
@@ -1476,4 +1473,111 @@ def analyze_image_api(request):
         return JsonResponse({
             'success': False,
             'error': f'Analysis failed: {str(e)}. Please try again.'
+        }, status=500)
+
+
+@csrf_exempt
+def analyze_url_ajax(request):
+    """API endpoint for URL analysis via AJAX - like image analysis"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'}, status=405)
+    
+    try:
+        # Get URL and date from form data
+        news_url = request.POST.get('news_url', '').strip()
+        publish_date = request.POST.get('publish_date', '')
+        
+        print(f"\n🌐 URL AJAX API Request received:")
+        print(f"   📍 URL to analyze: {news_url}")
+        print(f"   📅 Manual date: {publish_date if publish_date else 'Not provided'}")
+        
+        if not news_url:
+            return JsonResponse({
+                'success': False,
+                'error': 'No URL provided'
+            }, status=400)
+        
+        # Analyze the URL using existing function
+        print(f"🚀 Starting URL analysis...")
+        analyzed_article = analyze_news_url(news_url, publish_date if publish_date else None)
+        
+        # Format response similar to image analysis
+        analysis_result = {
+            'url': analyzed_article['url'],
+            'title': analyzed_article['title'],
+            'text': analyzed_article.get('text', ''),
+            'summary': analyzed_article.get('summary', ''),
+            'authors': analyzed_article.get('authors', []),
+            'publish_date': str(analyzed_article['publish_date']) if analyzed_article.get('publish_date') else None,
+            'keywords': analyzed_article.get('keywords', []),
+            'related_news': [],
+            'analysis_type': 'URL_ANALYSIS',
+            'extraction_method': 'Newspaper3k Parser'
+        }
+        
+        # Format related news
+        for news in analyzed_article.get('related_news', []):
+            analysis_result['related_news'].append({
+                'title': news.get('title', ''),
+                'link': news.get('link', ''),
+                'description': news.get('description', ''),
+                'source_id': news.get('source_id', ''),
+                'pubDate': news.get('pubDate', ''),
+                'similarity_score': news.get('similarity_score', 0)
+            })
+        
+        print(f"✅ URL analysis completed successfully")
+        return JsonResponse({
+            'success': True,
+            'analysis': analysis_result
+        })
+        
+    except Exception as e:
+        print(f"❌ Error in URL AJAX API: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'error': f'Analysis failed: {str(e)}. Please try again.'
+        }, status=500)
+
+
+@csrf_exempt
+def generate_ai_content_summary_api(request):
+    """API endpoint to generate AI content summary for OCR/Image analysis"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        ocr_text = data.get('ocr_text', '').strip()
+        related_news = data.get('related_news', [])
+        keywords = data.get('keywords', [])
+        
+        print(f"\n🤖 AI Content Summary API called")
+        print(f"📝 OCR Text: {ocr_text[:100]}...")
+        print(f"📊 Related articles: {len(related_news)}")
+        print(f"🔑 Keywords: {keywords[:5]}")
+        
+        if not ocr_text or not related_news:
+            return JsonResponse({
+                'success': False,
+                'error': 'Missing OCR text or related news data'
+            }, status=400)
+        
+        # Generate the content summary
+        content_summary = generate_ocr_content_summary(ocr_text, related_news, keywords)
+        
+        return JsonResponse({
+            'success': True,
+            'content_summary': content_summary
+        })
+        
+    except Exception as e:
+        print(f"❌ Error in AI Content Summary API: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'error': f'AI Summary generation failed: {str(e)}. Please try again.'
         }, status=500)

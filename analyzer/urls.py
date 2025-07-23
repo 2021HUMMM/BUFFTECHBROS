@@ -5,7 +5,9 @@ from analyzer.views import (
     analyze_news_url,
     ai_comparison_api,
     analyze_ocr_api,
-    analyze_image_api
+    analyze_image_api,
+    analyze_url_ajax,
+    generate_ai_content_summary_api
 )
 
 app_name = 'analyzer'
@@ -17,4 +19,5 @@ urlpatterns = [
     path('ai_comparison/', ai_comparison_api, name='ai_comparison'),
     path('analyze-ocr-api/', analyze_ocr_api, name='analyze_ocr_api'),
     path('analyze-image-api/', analyze_image_api, name='analyze_image_api'),
+    path('analyze-url-ajax/', analyze_url_ajax, name='analyze_url_ajax'),
 ]
