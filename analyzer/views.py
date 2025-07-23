@@ -1281,7 +1281,18 @@ def extract_headline_from_image(image_file):
         4. Preserve the original language (English, Indonesian, etc.)
         5. Return ONLY the headline text, no additional commentary
         
-        If no clear headline is visible, respond with "NO_HEADLINE_FOUND"
+        Response rules:
+        - If you find a clear, readable news headline: Return ONLY the headline text
+        - If the image contains random characters, gibberish, or unreadable text: Respond with "GIBBERISH"
+        - If no clear headline is visible: Respond with "NO_HEADLINE_FOUND"
+
+        
+        Examples:
+        Good: "Breaking: Indonesia announces new economic policy"
+        Good: "Presiden Jokowi resmikan jalan tol baru"
+        Bad: "adjdiwnfeuvb" → Return "GIBBERISH"
+        Bad: "cakaladut" → Return "GIBBERISH"
+        Bad: Blurry/unclear text → Return "NO_HEADLINE_FOUND"
         """
         
         # Send to OpenAI Vision API
@@ -1319,15 +1330,25 @@ def extract_headline_from_image(image_file):
             return {
                 'success': False,
                 'error': 'No clear headline found in the image',
-                'extracted_text': None
+                'extracted_text': None,
+                'validation_error': 'NO_HEADLINE_FOUND'
             }
         
-        return {
-            'success': True,
-            'extracted_text': extracted_text,
-            'method': 'OpenAI Vision API',
-            'confidence': 'high'
-        }
+        elif extracted_text == "GIBBERISH":
+            return {
+                'success': False,
+                'error': 'The extracted text appears to be random characters or unreadable content, not a recognizable news headline.',
+                'extracted_text': extracted_text,
+                'validation_error': 'GIBBERISH'
+            }
+        
+        else:
+            return {
+                'success': True,
+                'extracted_text': extracted_text,
+                'method': 'OpenAI Vision API',
+                'confidence': 'high'
+            }
         
     except Exception as e:
         print(f"❌ Error in OpenAI Vision extraction: {str(e)}")
@@ -1345,10 +1366,21 @@ def analyze_image_headline(image_file, manual_publish_date=None):
     extraction_result = extract_headline_from_image(image_file)
     
     if not extraction_result['success']:
-        return {
-            'extraction_error': extraction_result['error'],
-            'analysis_type': 'IMAGE_EXTRACTION_ERROR'
-        }
+
+        validation_error = extraction_result.get('validation_error', 'IMAGE_EXTRACTION_ERROR')
+        
+        if validation_error == 'GIBBERISH':
+            return {
+                'extraction_error': extraction_result['error'],
+                'analysis_type': 'TEXT_VALIDATION_ERROR',
+                'validation_reason': 'INVALID_GIBBERISH',
+                'extracted_text': extraction_result.get('extracted_text')
+            }
+        else:
+            return {
+                'extraction_error': extraction_result['error'],
+                'analysis_type': 'IMAGE_EXTRACTION_ERROR'
+            }
     
     headline_text = extraction_result['extracted_text']
     print(f"📰 Extracted headline: {headline_text}")
@@ -1357,9 +1389,20 @@ def analyze_image_headline(image_file, manual_publish_date=None):
     print(f"🔍 Starting news analysis for extracted headline...")
     analysis_result = analyze_ocr_text(headline_text, manual_publish_date)
     
+    # Step 3: Check if any related articles were found
+    if not analysis_result.get('related_news') or len(analysis_result.get('related_news', [])) == 0:
+        print(f"❌ No related articles found for the extracted headline")
+        return {
+            'extraction_error': f'No related news articles found for: "{headline_text}". The text may be too specific, outdated, or not covered by major news sources.',
+            'analysis_type': 'NO_ARTICLES_FOUND',
+            'extracted_text': headline_text,
+            'keywords_used': analysis_result.get('keywords', [])
+        }
+    
     # Add extraction info to the result
     analysis_result['extraction_method'] = 'OpenAI Vision API'
     analysis_result['extraction_confidence'] = 'high'
     analysis_result['original_image_processed'] = True
+    analysis_result['text_validated'] = True
     
     return analysis_result
