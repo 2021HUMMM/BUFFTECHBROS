@@ -1028,7 +1028,10 @@ def analyze_ocr_text(ocr_text, manual_publish_date=None):
             limit=10
         )
         
-        # Don't generate summary automatically - let user click button for AI analysis
+        # Generate summary of related articles instead of sentiment comparison
+        print(f"📄 Generating content summary for {len(related_news)} articles...")
+        content_summary = generate_ocr_content_summary(ocr_text, related_news, keywords_list)
+        
         print(f"✅ OCR analysis completed!")
         print(f"📊 Results: {len(related_news)} related articles found")
         
@@ -1038,8 +1041,8 @@ def analyze_ocr_text(ocr_text, manual_publish_date=None):
             'target_date': target_date,
             'manual_date_used': manual_publish_date is not None,
             'related_news': related_news,
-            'content_summary': None,  # Don't auto-generate, wait for user request
-            'analysis_type': 'OCR_ANALYSIS',
+            'content_summary': content_summary,
+            'analysis_type': 'OCR_CONTENT_SUMMARY',
             'search_info': {
                 'target_date': target_date.strftime('%Y-%m-%d'),
                 'keywords_used': keywords_list[:6],

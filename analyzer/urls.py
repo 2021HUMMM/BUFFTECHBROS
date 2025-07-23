@@ -20,4 +20,5 @@ urlpatterns = [
     path('analyze-ocr-api/', analyze_ocr_api, name='analyze_ocr_api'),
     path('analyze-image-api/', analyze_image_api, name='analyze_image_api'),
     path('analyze-url-ajax/', analyze_url_ajax, name='analyze_url_ajax'),
+    path('generate-ai-content-summary/', generate_ai_content_summary_api, name='generate_ai_content_summary'),
 ]

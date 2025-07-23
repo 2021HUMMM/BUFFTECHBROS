@@ -995,12 +995,6 @@
               Image Analysis Results
             </h2>
             <div class="flex items-center space-x-3">
-              <!-- AI Comparison Button -->
-              <button onclick="generateAIComparison()" id="aiComparisonBtn" 
-                      class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2">
-                <i class="fas fa-brain"></i>
-                <span>AI Comparison</span>
-              </button>
               <!-- Close Button -->
               <button onclick="closeAnalysisResults()" class="text-white hover:text-gray-200 transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1135,17 +1129,6 @@
               </div>
             </div>
           ` : ''}
-          
-          <!-- Analysis Info -->
-          <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-            <h4 class="font-semibold text-indigo-900 mb-2">Analysis Details</h4>
-            <div class="text-sm text-indigo-800 space-y-1">
-              <p><strong>Method:</strong> ${analysis.extraction_method || 'AI Vision + OCR'}</p>
-              <p><strong>Target Date:</strong> ${analysis.target_date || 'Current date'}</p>
-              <p><strong>Keywords Used:</strong> ${analysis.keywords ? analysis.keywords.slice(0, 3).join(', ') : 'None'}</p>
-              <p><strong>Analysis Type:</strong> ${analysis.analysis_type || 'Image headline extraction'}</p>
-            </div>
-          </div>
         </div>
       </div>
     `;
@@ -1389,17 +1372,6 @@
               </div>
             </div>
           ` : ''}
-          
-          <!-- Analysis Info -->
-          <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-            <h4 class="font-semibold text-indigo-900 mb-2">Analysis Details</h4>
-            <div class="text-sm text-indigo-800 space-y-1">
-              <p><strong>Method:</strong> ${analysis.extraction_method || 'URL content extraction'}</p>  
-              <p><strong>Target Date:</strong> ${analysis.target_date || 'Current date'}</p>
-              <p><strong>Keywords Used:</strong> ${analysis.keywords ? analysis.keywords.slice(0, 3).join(', ') : 'None'}</p>
-              <p><strong>Analysis Type:</strong> ${analysis.analysis_type || 'URL headline extraction'}</p>
-            </div>
-          </div>
         </div>
       </div>
     `;
