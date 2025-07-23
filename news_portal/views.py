@@ -1,11 +1,13 @@
 from django.conf import settings
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 import requests
 from analyzer.views import analyze_news_url
 from datetime import datetime, timedelta
 
 
+@login_required
 def show_news(request):
     search_query = request.GET.get('search', '')
     category = request.GET.get('category', '')

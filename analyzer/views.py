@@ -2,6 +2,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 import openai
 import requests
 import json
@@ -786,6 +787,7 @@ def analyze_news_url(url, manual_publish_date=None):
         }
 
 
+@login_required
 def analyze_url_api(request):
     """API endpoint for AJAX URL analysis"""
     news_url = request.GET.get('url', '')
@@ -861,6 +863,7 @@ def get_keywords(page_string):
 
 
 @csrf_exempt
+@login_required
 def ai_comparison_api(request):
     """
     API endpoint for generating AI comparison analysis
