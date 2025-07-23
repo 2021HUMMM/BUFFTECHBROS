@@ -601,6 +601,8 @@ def generate_comparative_summary(original_article, related_articles):
 
     Keep the analysis objective and highlight the most significant differences in viewpoints.
     Format your response in clear sections as requested above.
+
+    NOTE : TRANSLATE THE RESPONSE TO BAHASA INDONESIA
     """
     
     try:

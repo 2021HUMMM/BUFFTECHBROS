@@ -678,10 +678,10 @@
               ${result.sections ? Object.entries(result.sections).map(([title, content]) => `
                 <div class="mb-4">
                   <h5 class="font-semibold text-gray-900 mb-2">${title}</h5>
-                  <div class="text-gray-700 text-sm whitespace-pre-line">${content}</div>
+                  <div class="formatted-content">${formatAnalysisText(content)}</div>
                 </div>
               `).join('') : `
-                <div class="text-gray-700 text-sm whitespace-pre-line">${result.full_summary || result.summary || 'Analysis completed successfully.'}</div>
+                <div class="formatted-content">${formatAnalysisText(result.full_summary || result.summary || 'Analysis completed successfully.')}</div>
               `}
             </div>
             ${result.highest_disagreement_score && result.highest_disagreement_score > 0 ? `
@@ -749,6 +749,29 @@
       button.innerHTML = originalText;
       button.disabled = false;
     });
+  }
+
+  // Helper function to format text with proper styling
+  function formatAnalysisText(text) {
+    if (!text) return '';
+    
+    // Convert numbered sections and bold text to HTML
+    return text
+      // Convert numbered section headers (1. **ARTIKEL TERKAIT**: etc.) 
+      .replace(/^(\d+\.\s*\*\*[^*]+\*\*)/gm, '<div class="font-bold text-gray-900 mt-4 mb-2 text-base">$1</div>')
+      // Convert standalone section headers (ARTIKEL TERKAIT:, TINJAUAN UMUM:, etc.)
+      .replace(/^([A-ZÜÖÄ][A-ZÜÖÄ\s]*):?\s*$/gm, '<div class="font-bold text-gray-900 mt-3 mb-2 text-sm">$1</div>')
+      // Convert **text** to bold
+      .replace(/\*\*([^*]+)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>')
+      // Convert bullet points
+      .replace(/^[\-•]\s+(.+)$/gm, '<div class="ml-4 mb-1 text-gray-700 text-sm">• $1</div>')
+      // Convert line breaks properly
+      .split('\n\n').map(paragraph => {
+        if (paragraph.trim() && !paragraph.includes('<div class="font-bold')) {
+          return `<p class="text-gray-700 text-sm mb-2 leading-relaxed">${paragraph.replace(/\n/g, '<br>')}</p>`;
+        }
+        return paragraph.replace(/\n/g, '<br>');
+      }).join('');
   }
 
   // Helper function to get CSRF token
@@ -1238,12 +1261,6 @@
               URL Analysis Results
             </h2>
             <div class="flex items-center space-x-3">
-              <!-- AI Comparison Button -->
-              <button onclick="generateAIComparison()" id="aiComparisonBtn" 
-                      class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2">
-                <i class="fas fa-brain"></i>
-                <span>AI Comparison</span>
-              </button>
               <!-- Close Button -->
               <button onclick="closeAnalysisResults()" class="text-white hover:text-gray-200 transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1337,6 +1354,18 @@
               <p class="text-gray-500">No related articles found for this URL</p>
             </div>
           `}
+          
+          <!-- AI Comparison Button Section -->
+          ${analysis.related_news && analysis.related_news.length > 0 ? `
+            <div class="border-t border-gray-200 pt-6 mt-6 text-center">
+              <button onclick="generateAIComparison()" id="aiComparisonBtn" 
+                      class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2 mx-auto">
+                <i class="fas fa-brain"></i>
+                <span>Generate AI Comparison</span>
+              </button>
+              <p class="text-gray-500 text-sm mt-2">Compare this article with related news using AI analysis</p>
+            </div>
+          ` : ''}
           
           <!-- AI Content Analysis -->
           ${analysis.content_summary && analysis.content_summary.sections ? `
