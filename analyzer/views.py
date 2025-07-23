@@ -1406,3 +1406,74 @@ def analyze_image_headline(image_file, manual_publish_date=None):
     analysis_result['text_validated'] = True
     
     return analysis_result
+
+
+@csrf_exempt
+def analyze_image_api(request):
+    """API endpoint for image headline analysis"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'}, status=405)
+    
+    try:
+        # Get image file and optional date
+        image_file = request.FILES.get('image')
+        publish_date = request.POST.get('publish_date', '')
+        
+        print(f"\n🌐 Image API Request received:")
+        print(f"   🖼️ Image file: {image_file.name if image_file else 'Not provided'}")
+        print(f"   📅 Manual date: {publish_date if publish_date else 'Not provided'}")
+        
+        if not image_file:
+            return JsonResponse({
+                'success': False,
+                'error': 'No image file provided'
+            }, status=400)
+        
+        # Analyze the image
+        print(f"🚀 Starting image analysis...")
+        analysis_result = analyze_image_headline(image_file, publish_date if publish_date else None)
+        
+        # Check for various error types
+        if 'extraction_error' in analysis_result:
+            analysis_type = analysis_result.get('analysis_type', 'UNKNOWN_ERROR')
+            
+            if analysis_type == 'TEXT_VALIDATION_ERROR':
+                print(f"❌ Text validation failed")
+                return JsonResponse({
+                    'success': False,
+                    'error': analysis_result['extraction_error'],
+                    'validation_error': 'GIBBERISH',
+                    'extracted_text': analysis_result.get('extracted_text')
+                }, status=400)
+            
+            elif analysis_type == 'NO_ARTICLES_FOUND':
+                print(f"⚠️ No articles found for extracted text")
+                return JsonResponse({
+                    'success': False,
+                    'error': analysis_result['extraction_error'],
+                    'validation_error': 'NO_ARTICLES_FOUND',
+                    'extracted_text': analysis_result.get('extracted_text'),
+                    'keywords_used': analysis_result.get('keywords_used', [])
+                }, status=404)
+            
+            else:
+                print(f"❌ Image extraction failed")
+                return JsonResponse({
+                    'success': False,
+                    'error': analysis_result['extraction_error']
+                }, status=500)
+        
+        print(f"✅ Image analysis completed successfully")
+        return JsonResponse({
+            'success': True,
+            'analysis': analysis_result
+        })
+        
+    except Exception as e:
+        print(f"❌ Error in Image API: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'error': f'Analysis failed: {str(e)}. Please try again.'
+        }, status=500)

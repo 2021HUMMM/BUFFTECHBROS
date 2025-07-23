@@ -88,6 +88,97 @@
             </form>
           </div>
           
+          <!-- Image Analysis Card -->
+          <div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-green-600 p-4">
+              <h3 class="text-white font-bold text-lg flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                Image Analyzer
+              </h3>
+              <p class="text-gray-300 text-sm mt-1">Extract headlines from news images</p>
+            </div>
+            
+            <form method="POST" action="{% url 'analyzer:analyze_image_api' %}" enctype="multipart/form-data" class="p-4 space-y-4" id="imageAnalysisForm">
+              {% csrf_token %}
+              
+              <!-- Image Upload -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  🖼️ Upload News Image
+                </label>
+                <div class="relative">
+                  <input 
+                    type="file" 
+                    name="image"
+                    accept="image/*"
+                    id="imageUpload"
+                    required
+                    class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                  >
+                </div>
+                <div class="mt-2 text-xs text-gray-500">
+                  Supported: JPG, PNG, GIF (max 10MB)
+                </div>
+              </div>
+              
+              <!-- Image Preview -->
+              <div id="imagePreview" class="hidden">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  👁️ Preview
+                </label>
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                  <img id="previewImg" src="" alt="Preview" class="w-full h-32 object-cover">
+                </div>
+              </div>
+              
+              <!-- Target Date Input -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  📅 Target Date (optional)
+                </label>
+                <div class="space-y-2">
+                  <input 
+                    type="date" 
+                    name="publish_date"
+                    id="imagePublishDate"
+                    class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                  >
+                  <div class="flex gap-1">
+                    <button 
+                      type="button"
+                      onclick="document.getElementById('imagePublishDate').value = new Date().toISOString().split('T')[0]"
+                      class="flex-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded hover:bg-green-200 transition-colors">
+                      Today
+                    </button>
+                    <button 
+                      type="button"
+                      onclick="document.getElementById('imagePublishDate').value = ''"
+                      class="flex-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200 transition-colors">
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Analyze Button -->
+              <button 
+                type="submit"
+                id="analyzeImageBtn"
+                class="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <span id="analyzeImageBtnText">Analyze Image</span>
+              </button>
+              
+              <div class="text-xs text-gray-600 bg-green-50 border border-green-100 rounded-lg p-3">
+                💡 <strong>How it works:</strong> Upload an image containing news headlines. Our AI will extract the text and find related articles using Vision API + keyword matching.
+              </div>
+            </form>
+          </div>
+          
           <!-- Quick Stats Card -->
           <div class="bg-white border border-gray-200 rounded-lg shadow-lg p-4">
             <h4 class="font-bold text-gray-900 mb-3 flex items-center">
@@ -669,6 +760,360 @@
       }
     }
     return cookieValue;
+  }
+
+  // Image Analysis Functions
+  document.addEventListener('DOMContentLoaded', function() {
+    const imageUpload = document.getElementById('imageUpload');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const imageAnalysisForm = document.getElementById('imageAnalysisForm');
+    const analyzeImageBtn = document.getElementById('analyzeImageBtn');
+    const analyzeImageBtnText = document.getElementById('analyzeImageBtnText');
+    
+    // Image preview functionality
+    if (imageUpload) {
+      imageUpload.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          // Check file size (max 10MB)
+          if (file.size > 10 * 1024 * 1024) {
+            alert('File size too large. Please select an image smaller than 10MB.');
+            e.target.value = '';
+            imagePreview.classList.add('hidden');
+            return;
+          }
+          
+          // Show preview
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            imagePreview.classList.remove('hidden');
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imagePreview.classList.add('hidden');
+        }
+      });
+    }
+    
+    // Image analysis form submission
+    if (imageAnalysisForm) {
+      imageAnalysisForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const imageFile = imageUpload.files[0];
+        
+        if (!imageFile) {
+          alert('Please select an image file first.');
+          return;
+        }
+        
+        // Update button state
+        analyzeImageBtn.disabled = true;
+        analyzeImageBtnText.textContent = 'Processing...';
+        analyzeImageBtn.innerHTML = `
+          <svg class="w-5 h-5 inline mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Analyzing Image...</span>
+        `;
+        
+        // Clear previous results
+        const analysisContainer = document.getElementById('analysisResultsContainer');
+        if (analysisContainer) {
+          analysisContainer.remove();
+        }
+        
+        // Submit to analyzer API
+        fetch('/analyzer/analyze-image-api/', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Reset button
+          analyzeImageBtn.disabled = false;
+          analyzeImageBtn.innerHTML = `
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <span>Analyze Image</span>
+          `;
+          
+          if (data.success && data.analysis) {
+            console.log('Image analysis result:', data.analysis); // Debug log
+            displayImageAnalysisResults(data.analysis);
+          } else {
+            displayImageAnalysisError(data.error || 'Analysis failed', data);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          
+          // Reset button
+          analyzeImageBtn.disabled = false;
+          analyzeImageBtn.innerHTML = `
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <span>Analyze Image</span>
+          `;
+          
+          displayImageAnalysisError('Network error occurred. Please try again.');
+        });
+      });
+    }
+  });
+  
+  // Display image analysis results
+  function displayImageAnalysisResults(analysis) {
+    const mainContent = document.querySelector('.lg\\:col-span-3');
+    
+    // Create results container
+    const resultsHTML = `
+      <div id="analysisResultsContainer" class="mb-8 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+        <div class="bg-green-600 p-4">
+          <div class="flex justify-between items-center">
+            <h2 class="text-white font-bold text-xl flex items-center">
+              <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              Image Analysis Results
+            </h2>
+            <button onclick="closeAnalysisResults()" class="text-white hover:text-gray-200 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          <p class="text-green-100 text-sm mt-1">AI extracted ${analysis.keywords ? analysis.keywords.length : 0} keywords • Found ${analysis.related_news ? analysis.related_news.length : 0} related articles</p>
+        </div>
+        
+        <div class="p-6">
+          <!-- Extracted Text -->
+          <div class="mb-6">
+            <h3 class="font-semibold text-gray-900 mb-2 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Extracted Text
+            </h3>
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <p class="text-gray-800 font-medium">"${analysis.ocr_text || analysis.extracted_text || 'No text extracted'}"</p>
+            </div>
+          </div>
+          
+          <!-- Keywords -->
+          ${analysis.keywords && analysis.keywords.length > 0 ? `
+            <div class="mb-6">
+              <h3 class="font-semibold text-gray-900 mb-2 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                Keywords Found (${analysis.keywords.length})
+              </h3>
+              <div class="flex flex-wrap gap-2">
+                ${analysis.keywords.map(keyword => `
+                  <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">${keyword}</span>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          
+          <!-- Related Articles -->
+          ${analysis.related_news && analysis.related_news.length > 0 ? `
+            <div class="mb-6">
+              <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                </svg>
+                Related Articles (${analysis.related_news.length})
+              </h3>
+              <div class="space-y-4">
+                ${analysis.related_news.slice(0, 10).map((article, index) => `
+                  <div class="border border-gray-200 rounded-lg p-4 hover:border-green-300 transition-colors">
+                    <div class="flex justify-between items-start mb-2">
+                      <h4 class="font-medium text-gray-900 leading-tight">
+                        <a href="${article.link}" target="_blank" class="hover:text-green-600 transition-colors">
+                          ${article.title || 'No title available'}
+                        </a>
+                      </h4>
+                      ${article.similarity_score ? `
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium ml-2 whitespace-nowrap">
+                          ${article.similarity_score}% match
+                        </span>
+                      ` : ''}
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">${article.description || 'No description available'}</p>
+                    <div class="flex items-center text-xs text-gray-500 space-x-4">
+                      <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        ${article.pubDate ? new Date(article.pubDate).toLocaleDateString() : 'Unknown date'}
+                      </span>
+                      <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        ${article.source_id || 'Unknown source'}
+                      </span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : `
+            <div class="text-center py-8">
+              <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <p class="text-gray-500">No related articles found for this image</p>
+            </div>
+          `}
+          
+          <!-- AI Content Analysis -->
+          ${analysis.content_summary && analysis.content_summary.sections ? `
+            <div class="mb-6">
+              <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                AI Content Analysis
+                <span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                  ${analysis.content_summary.articles_analyzed || 0} Articles Analyzed
+                </span>
+              </h3>
+              
+              <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div class="prose prose-sm max-w-none">
+                  ${Object.entries(analysis.content_summary.sections).map(([title, content]) => `
+                    <div class="mb-4">
+                      <h5 class="font-semibold text-gray-900 mb-2">${title}</h5>
+                      <div class="text-gray-700 text-sm whitespace-pre-line">${content}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          ` : analysis.content_summary && analysis.content_summary.full_summary ? `
+            <div class="mb-6">
+              <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                AI Content Analysis
+              </h3>
+              
+              <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div class="prose prose-sm max-w-none">
+                  <div class="text-gray-700 text-sm whitespace-pre-line">${analysis.content_summary.full_summary}</div>
+                </div>
+              </div>
+            </div>
+          ` : ''}
+          
+          <!-- Analysis Info -->
+          <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <h4 class="font-semibold text-green-900 mb-2">Analysis Details</h4>
+            <div class="text-sm text-green-800 space-y-1">
+              <p><strong>Method:</strong> ${analysis.extraction_method || 'AI Vision + OCR'}</p>
+              <p><strong>Target Date:</strong> ${analysis.target_date || 'Current date'}</p>
+              <p><strong>Keywords Used:</strong> ${analysis.keywords ? analysis.keywords.slice(0, 3).join(', ') : 'None'}</p>
+              <p><strong>Analysis Type:</strong> ${analysis.analysis_type || 'Image headline extraction'}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Insert results at the top of main content
+    mainContent.insertAdjacentHTML('afterbegin', resultsHTML);
+    
+    // Smooth scroll to results
+    document.getElementById('analysisResultsContainer').scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+  }
+  
+  // Display image analysis error
+  function displayImageAnalysisError(errorMessage, errorData = {}) {
+    const mainContent = document.querySelector('.lg\\:col-span-3');
+    
+    let errorDetails = '';
+    if (errorData.validation_error === 'GIBBERISH') {
+      errorDetails = `
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+          <h4 class="font-semibold text-yellow-800 mb-2">Text Validation Issue</h4>
+          <p class="text-yellow-700 text-sm">The extracted text appears to be random characters or unreadable content, not a recognizable news headline.</p>
+          ${errorData.extracted_text ? `<p class="text-yellow-600 text-xs mt-2"><strong>Extracted:</strong> "${errorData.extracted_text}"</p>` : ''}
+        </div>
+      `;
+    } else if (errorData.validation_error === 'NO_ARTICLES_FOUND') {
+      errorDetails = `
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <h4 class="font-semibold text-blue-800 mb-2">No Related Articles Found</h4>
+          <p class="text-blue-700 text-sm">We successfully extracted text from the image, but couldn't find related news articles.</p>
+          ${errorData.extracted_text ? `<p class="text-blue-600 text-xs mt-2"><strong>Extracted Text:</strong> "${errorData.extracted_text}"</p>` : ''}
+          ${errorData.keywords_used && errorData.keywords_used.length > 0 ? `<p class="text-blue-600 text-xs mt-1"><strong>Keywords Used:</strong> ${errorData.keywords_used.join(', ')}</p>` : ''}
+        </div>
+      `;
+    }
+    
+    const errorHTML = `
+      <div id="analysisResultsContainer" class="mb-8 bg-white border border-red-200 rounded-lg shadow-lg overflow-hidden">
+        <div class="bg-red-600 p-4">
+          <div class="flex justify-between items-center">
+            <h2 class="text-white font-bold text-xl flex items-center">
+              <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+              Image Analysis Failed
+            </h2>
+            <button onclick="closeAnalysisResults()" class="text-white hover:text-gray-200 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          ${errorDetails}
+          
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p class="text-red-800 font-medium mb-2">Error Details:</p>
+            <p class="text-red-700 text-sm">${errorMessage}</p>
+          </div>
+          
+          <div class="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <h4 class="font-semibold text-gray-900 mb-2">💡 Tips for better results:</h4>
+            <ul class="text-sm text-gray-700 space-y-1">
+              <li>• Ensure the image contains clear, readable news headlines</li>
+              <li>• Use high-quality images with good contrast</li>
+              <li>• Make sure the text is in a supported language (English/Indonesian)</li>
+              <li>• Try images from recent news articles for better matching</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Insert error message at the top of main content
+    mainContent.insertAdjacentHTML('afterbegin', errorHTML);
+    
+    // Smooth scroll to results
+    document.getElementById('analysisResultsContainer').scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
   }
 
   // Keyboard shortcut to close analysis (Escape key)
