@@ -9,10 +9,7 @@ django-cors-headers
 python-decouple
 newsapi-python
 numpy
-opencv-python
-easyocr
 openai
 spacy
-https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
 newspaper3k
 lxml_html_clean
