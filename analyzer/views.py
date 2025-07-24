@@ -1144,9 +1144,9 @@ def analyze_ocr_text(ocr_text, manual_publish_date=None):
                 'target_date': target_date.strftime('%Y-%m-%d'),
                 'keywords_used': keywords_list[:6],
                 'total_found': len(related_news),
-                'analysis_method': 'OCR headline analysis + content summary',
-                'sorting_method': 'Similarity + Recency (no sentiment analysis)',
-                'limitation': 'Limited to headline analysis - full article sentiment comparison not available'
+                'analysis_method': 'Analisis headline OCR + ringkasan konten',
+                'sorting_method': 'Kesamaan + Keterbaruan (tidak ada analisis sentimen)',
+                'limitation': 'Terbatas pada analisis headline - perbandingan sentimen artikel lengkap tidak tersedia'
             }
         }
         
@@ -1171,21 +1171,21 @@ def generate_ocr_content_summary(ocr_text, related_articles, keywords):
     
     if not related_articles:
         return {
-            'summary': 'No related articles found to summarize.',
-            'content_analysis': 'Unable to provide content analysis - no related articles available.',
-            'coverage_overview': 'No coverage found for this topic.'
+            'summary': 'Tidak ditemukan artikel terkait untuk dirangkum.',
+            'content_analysis': 'Tidak dapat memberikan analisis konten - tidak ada artikel terkait yang tersedia.',
+            'coverage_overview': 'Tidak ditemukan liputan untuk topik ini.'
         }
     
     # Get content from top related articles
-    articles_content = f"ORIGINAL OCR TEXT (from social media/image):\n{ocr_text}\n\n"
-    articles_content += f"SEARCH KEYWORDS USED: {', '.join(keywords[:5])}\n\n"
+    articles_content = f"TEKS OCR ASLI (dari media sosial/gambar):\n{ocr_text}\n\n"
+    articles_content += f"KATA KUNCI PENCARIAN YANG DIGUNAKAN: {', '.join(keywords[:5])}\n\n"
     
     # Fetch content from top 5 related articles
     for i, article in enumerate(related_articles[:5], 1):
-        title = article.get('title', f'Article {i}')
+        title = article.get('title', f'Artikel {i}')
         similarity_score = article.get('similarity_score', 0)
-        source = article.get('source_id', 'Unknown')
-        pub_date = article.get('pubDate', 'Unknown date')
+        source = article.get('source_id', 'Tidak diketahui')
+        pub_date = article.get('pubDate', 'Tanggal tidak diketahui')
         
         # Try to get article content
         article_content = ""
@@ -1200,39 +1200,39 @@ def generate_ocr_content_summary(ocr_text, related_articles, keywords):
                 # print(f"    ✅ Content fetched: {len(article_content)} chars")
             except Exception as e:
                 # print(f"    ❌ Failed to fetch content: {str(e)[:30]}...")
-                article_content = f"{article.get('description', 'No description available')}"
+                article_content = f"{article.get('description', 'Tidak ada deskripsi tersedia')}"
         else:
-            article_content = f"{article.get('description', 'No description available')}"
+            article_content = f"{article.get('description', 'Tidak ada deskripsi tersedia')}"
         
-        articles_content += f"RELATED ARTICLE {i} (Similarity: {similarity_score}):\n"
-        articles_content += f"Title: {title}\n"
-        articles_content += f"Source: {source}\n"
-        articles_content += f"Date: {pub_date}\n"
-        articles_content += f"Content: {article_content}...\n\n"
+        articles_content += f"ARTIKEL TERKAIT {i} (Kesamaan: {similarity_score}):\n"
+        articles_content += f"Judul: {title}\n"
+        articles_content += f"Sumber: {source}\n"
+        articles_content += f"Tanggal: {pub_date}\n"
+        articles_content += f"Konten: {article_content}...\n\n"
     
     # Create prompt for content summary (not sentiment comparison)
     prompt = f"""
-    You are analyzing a headline/text extracted from social media (OCR) and related news articles found about the same topic.
-    Since this is OCR from social media, we don't have the full original article content, so focus on content summary rather than sentiment comparison.
+    Anda sedang menganalisis headline/teks yang diekstrak dari media sosial (OCR) dan artikel berita terkait yang ditemukan tentang topik yang sama.
+    Karena ini adalah OCR dari media sosial, kami tidak memiliki konten artikel asli yang lengkap, jadi fokus pada ringkasan konten daripada perbandingan sentimen.
     
     {articles_content}
     
-    Please provide a comprehensive analysis in the following structure:
+    Mohon berikan analisis komprehensif dalam struktur berikut:
 
-    1. TOPIC ANALYSIS: What topic/event is this OCR text referring to based on the related articles found?
+    1. ANALISIS TOPIK: Topik/peristiwa apa yang dimaksud oleh teks OCR ini berdasarkan artikel terkait yang ditemukan?
     
-    2. RELATED COVERAGE: Summary of how different news sources are covering this topic
+    2. LIPUTAN TERKAIT: Ringkasan bagaimana sumber berita yang berbeda meliput topik ini
     
-    3. KEY INFORMATION: The most important facts and details found across the related articles
+    3. INFORMASI KUNCI: Fakta dan detail paling penting yang ditemukan di seluruh artikel terkait
     
-    4. SOURCE DIVERSITY: Analysis of the variety of sources covering this topic
+    4. KERAGAMAN SUMBER: Analisis variasi sumber yang meliput topik ini
     
-    5. CONTENT VERIFICATION: Based on the related articles, does the OCR text appear to be about a legitimate news topic?
+    5. VERIFIKASI KONTEN: Berdasarkan artikel terkait, apakah teks OCR tampaknya tentang topik berita yang sah?
     
-    6. SUMMARY: Overall summary of what we learned about this topic from the related articles
+    6. RINGKASAN: Ringkasan keseluruhan tentang apa yang kita pelajari tentang topik ini dari artikel terkait
 
-    Keep the analysis factual and informative. Focus on providing context and information rather than opinion comparison.
-    Format your response in clear sections as requested above.
+    Jaga analisis tetap faktual dan informatif. Fokus pada memberikan konteks dan informasi daripada perbandingan opini.
+    Format respons Anda dalam bagian yang jelas seperti yang diminta di atas.
     """
     
     try:
@@ -1262,8 +1262,8 @@ def generate_ocr_content_summary(ocr_text, related_articles, keywords):
             if not line:
                 continue
                 
-            # Check for section headers
-            if any(header in line.upper() for header in ['TOPIC ANALYSIS', 'RELATED COVERAGE', 'KEY INFORMATION', 'SOURCE DIVERSITY', 'CONTENT VERIFICATION', 'SUMMARY']):
+            # Check for section headers (Indonesian)
+            if any(header in line.upper() for header in ['ANALISIS TOPIK', 'LIPUTAN TERKAIT', 'INFORMASI KUNCI', 'KERAGAMAN SUMBER', 'VERIFIKASI KONTEN', 'RINGKASAN']):
                 # Save previous section
                 if current_section and current_content:
                     sections[current_section] = '\n'.join(current_content)
@@ -1289,7 +1289,7 @@ def generate_ocr_content_summary(ocr_text, related_articles, keywords):
     except Exception as e:
         # print(f"❌ Error generating content summary: {str(e)}")
         return {
-            'full_summary': f'Error generating summary: {str(e)}',
+            'full_summary': f'Gagal menghasilkan ringkasan: {str(e)}',
             'sections': {},
             'articles_analyzed': 0,
             'analysis_type': 'SUMMARY_ERROR'
@@ -1313,7 +1313,7 @@ def analyze_ocr_api(request):
         if not ocr_text:
             return JsonResponse({
                 'success': False,
-                'error': 'No OCR text provided'
+                'error': 'Tidak ada teks OCR yang diberikan'
             }, status=400)
         
         # Analyze OCR text
@@ -1327,12 +1327,12 @@ def analyze_ocr_api(request):
         })
         
     except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        return JsonResponse({'error': 'Data JSON tidak valid'}, status=400)
     except Exception as e:
         # print(f"❌ Error in OCR analysis API: {str(e)}")
         return JsonResponse({
             'success': False,
-            'error': f'OCR analysis failed: {str(e)}'
+            'error': f'Analisis OCR gagal: {str(e)}'
         }, status=500)
 
 def extract_headline_from_image(image_file):
@@ -1369,27 +1369,27 @@ def extract_headline_from_image(image_file):
         
         # Create prompt for headline extraction
         prompt = """
-        You are analyzing an image that contains news headlines, likely from social media (Instagram, Facebook, Twitter, etc.) or news websites.
+        Anda sedang menganalisis gambar yang berisi berita utama, kemungkinan dari media sosial (Instagram, Facebook, Twitter, dll.) atau website berita.
         
-        Please:
-        1. Extract the main headline/news text from this image
-        2. Focus on the primary news content, ignore usernames, timestamps, reaction counts, etc.
-        3. If there are multiple headlines, prioritize the largest/most prominent one
-        4. Preserve the original language (English, Indonesian, etc.)
-        5. Return ONLY the headline text, no additional commentary
+        Tolong:
+        1. Ekstrak teks berita utama/headline dari gambar ini
+        2. Fokus pada konten berita utama, abaikan username, timestamp, jumlah like, dll.
+        3. Jika ada beberapa headline, prioritaskan yang paling besar/menonjol
+        4. Pertahankan bahasa asli (Inggris, Indonesia, dll.)
+        5. Kembalikan HANYA teks headline, tanpa komentar tambahan
         
-        Response rules:
-        - If you find a clear, readable news headline: Return ONLY the headline text
-        - If the image contains random characters, gibberish, or unreadable text: Respond with "GIBBERISH"
-        - If no clear headline is visible: Respond with "NO_HEADLINE_FOUND"
+        Aturan respon:
+        - Jika menemukan headline berita yang jelas dan dapat dibaca: Kembalikan HANYA teks headline
+        - Jika gambar berisi karakter acak, tidak jelas, atau tidak dapat dibaca: Respon dengan "GIBBERISH"
+        - Jika tidak ada headline yang jelas terlihat: Respon dengan "NO_HEADLINE_FOUND"
 
         
-        Examples:
-        Good: "Breaking: Indonesia announces new economic policy"
-        Good: "Presiden Jokowi resmikan jalan tol baru"
-        Bad: "adjdiwnfeuvb" → Return "GIBBERISH"
-        Bad: "cakaladut" → Return "GIBBERISH"
-        Bad: Blurry/unclear text → Return "NO_HEADLINE_FOUND"
+        Contoh:
+        Baik: "Breaking: Indonesia announces new economic policy"
+        Baik: "Presiden Jokowi resmikan jalan tol baru"
+        Buruk: "adjdiwnfeuvb" → Kembalikan "GIBBERISH"
+        Buruk: "cakaladut" → Kembalikan "GIBBERISH"
+        Buruk: Teks buram/tidak jelas → Kembalikan "NO_HEADLINE_FOUND"
         """
         
         # Send to OpenAI Vision API
@@ -1426,7 +1426,7 @@ def extract_headline_from_image(image_file):
         if extracted_text == "NO_HEADLINE_FOUND":
             return {
                 'success': False,
-                'error': 'No clear headline found in the image',
+                'error': 'Tidak ditemukan headline yang jelas dalam gambar',
                 'extracted_text': None,
                 'validation_error': 'NO_HEADLINE_FOUND'
             }
@@ -1434,7 +1434,7 @@ def extract_headline_from_image(image_file):
         elif extracted_text == "GIBBERISH":
             return {
                 'success': False,
-                'error': 'The extracted text appears to be random characters or unreadable content, not a recognizable news headline.',
+                'error': 'Teks yang diekstrak tampaknya berupa karakter acak atau konten yang tidak dapat dibaca, bukan headline berita yang dapat dikenali.',
                 'extracted_text': extracted_text,
                 'validation_error': 'GIBBERISH'
             }
@@ -1451,7 +1451,7 @@ def extract_headline_from_image(image_file):
         # print(f"❌ Error in OpenAI Vision extraction: {str(e)}")
         return {
             'success': False,
-            'error': f'Vision API failed: {str(e)}',
+            'error': f'Vision API gagal: {str(e)}',
             'extracted_text': None
         }
 
@@ -1490,7 +1490,7 @@ def analyze_image_headline(image_file, manual_publish_date=None):
     if not analysis_result.get('related_news') or len(analysis_result.get('related_news', [])) == 0:
         # print(f"❌ No related articles found for the extracted headline")
         return {
-            'extraction_error': f'No related news articles found for: "{headline_text}". The text may be too specific, outdated, or not covered by major news sources.',
+            'extraction_error': f'Tidak ditemukan artikel berita terkait untuk: "{headline_text}". Teks mungkin terlalu spesifik, sudah usang, atau tidak diliput oleh sumber berita utama.',
             'analysis_type': 'NO_ARTICLES_FOUND',
             'extracted_text': headline_text,
             'keywords_used': analysis_result.get('keywords', [])
