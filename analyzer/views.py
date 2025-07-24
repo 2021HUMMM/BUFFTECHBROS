@@ -1217,22 +1217,31 @@ def generate_ocr_content_summary(ocr_text, related_articles, keywords):
     
     {articles_content}
     
-    Mohon berikan analisis komprehensif dalam struktur berikut:
+    WAJIB gunakan format persis seperti ini (termasuk nomor dan nama section):
 
-    1. ANALISIS TOPIK: Topik/peristiwa apa yang dimaksud oleh teks OCR ini berdasarkan artikel terkait yang ditemukan?
+    1. ANALISIS TOPIK
+    Topik/peristiwa apa yang dimaksud oleh teks OCR ini berdasarkan artikel terkait yang ditemukan?
     
-    2. LIPUTAN TERKAIT: Ringkasan bagaimana sumber berita yang berbeda meliput topik ini
+    2. LIPUTAN TERKAIT
+    Ringkasan bagaimana sumber berita yang berbeda meliput topik ini
     
-    3. INFORMASI KUNCI: Fakta dan detail paling penting yang ditemukan di seluruh artikel terkait
+    3. INFORMASI KUNCI
+    Fakta dan detail paling penting yang ditemukan di seluruh artikel terkait
     
-    4. KERAGAMAN SUMBER: Analisis variasi sumber yang meliput topik ini
+    4. KERAGAMAN SUMBER
+    Analisis variasi sumber yang meliput topik ini, sertakan judul dan sumber artikelnya juga
     
-    5. VERIFIKASI KONTEN: Berdasarkan artikel terkait, apakah teks OCR tampaknya tentang topik berita yang sah?
+    5. VERIFIKASI KONTEN
+    Berdasarkan artikel terkait, apakah teks OCR tampaknya tentang topik berita yang sah?
     
-    6. RINGKASAN: Ringkasan keseluruhan tentang apa yang kita pelajari tentang topik ini dari artikel terkait
+    6. RINGKASAN
+    Ringkasan keseluruhan tentang apa yang kita pelajari tentang topik ini dari artikel terkait
 
-    Jaga analisis tetap faktual dan informatif. Fokus pada memberikan konteks dan informasi daripada perbandingan opini.
-    Format respons Anda dalam bagian yang jelas seperti yang diminta di atas.
+    PENTING:
+    - Setiap section HARUS dimulai dengan nomor dan nama persis seperti contoh
+    - Jaga analisis tetap faktual dan informatif
+    - Fokus pada memberikan konteks dan informasi daripada perbandingan opini
+    - Maksimal 400 kata total
     """
     
     try:
@@ -1253,6 +1262,7 @@ def generate_ocr_content_summary(ocr_text, related_articles, keywords):
         # print(f"📄 Summary length: {len(summary_text)} characters")
         
         # Parse sections like in the sentiment analysis
+        import re
         sections = {}
         current_section = None
         current_content = []
@@ -1262,16 +1272,50 @@ def generate_ocr_content_summary(ocr_text, related_articles, keywords):
             if not line:
                 continue
                 
-            # Check for section headers (Indonesian)
-            if any(header in line.upper() for header in ['ANALISIS TOPIK', 'LIPUTAN TERKAIT', 'INFORMASI KUNCI', 'KERAGAMAN SUMBER', 'VERIFIKASI KONTEN', 'RINGKASAN']):
-                # Save previous section
-                if current_section and current_content:
-                    sections[current_section] = '\n'.join(current_content)
+            # Look for numbered sections (1., 2., 3., etc.) followed by section names
+            section_match = re.match(r'^(\d+)\.\s*(.*?)$', line)
+            if section_match:
+                number = section_match.group(1)
+                section_name = section_match.group(2).upper().strip()
                 
-                # Start new section
-                current_section = line.replace(':', '').strip()
+                # Save previous section if exists
+                if current_section and current_content:
+                    sections[current_section] = '\n'.join(current_content).strip()
+                
+                # Map section names to expected format
+                if 'ANALISIS TOPIK' in section_name or 'TOPIC' in section_name:
+                    current_section = 'ANALISIS TOPIK'
+                elif 'LIPUTAN TERKAIT' in section_name or 'RELATED' in section_name:
+                    current_section = 'LIPUTAN TERKAIT'
+                elif 'INFORMASI KUNCI' in section_name or 'KEY' in section_name:
+                    current_section = 'INFORMASI KUNCI'
+                elif 'KERAGAMAN SUMBER' in section_name or 'SOURCE' in section_name:
+                    current_section = 'KERAGAMAN SUMBER'
+                elif 'VERIFIKASI KONTEN' in section_name or 'VERIFICATION' in section_name:
+                    current_section = 'VERIFIKASI KONTEN'
+                elif 'RINGKASAN' in section_name or 'SUMMARY' in section_name:
+                    current_section = 'RINGKASAN'
+                else:
+                    # Default mapping based on number
+                    if number == '1':
+                        current_section = 'ANALISIS TOPIK'
+                    elif number == '2':
+                        current_section = 'LIPUTAN TERKAIT'
+                    elif number == '3':
+                        current_section = 'INFORMASI KUNCI'
+                    elif number == '4':
+                        current_section = 'KERAGAMAN SUMBER'
+                    elif number == '5':
+                        current_section = 'VERIFIKASI KONTEN'
+                    elif number == '6':
+                        current_section = 'RINGKASAN'
+                    else:
+                        current_section = section_name
+                
                 current_content = []
+                
             else:
+                # This is content for the current section
                 if current_section:
                     current_content.append(line)
         
