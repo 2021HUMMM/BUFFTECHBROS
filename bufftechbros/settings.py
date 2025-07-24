@@ -56,6 +56,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://bufftechbros-production.up.railway.app"
+]
+
 ROOT_URLCONF = 'bufftechbros.urls'
 
 TEMPLATES = [
