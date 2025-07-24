@@ -19,7 +19,7 @@ client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 def analyze_sentiment_disagreement(original_text, related_article, keywords):
     """Analyze sentiment disagreement between original article and related article"""
     
-    print(f"🎭 Starting sentiment analysis for: {related_article.get('title', 'No title')[:50]}...")
+    # # print(f"🎭 Starting sentiment analysis for: {related_article.get('title', 'No title')[:50]}...")
     
     # Get related article content
     related_content = ""
@@ -27,14 +27,14 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
     
     if article_url:
         try:
-            print(f"     📰 Fetching content for sentiment analysis...")
+            # # print(f"     📰 Fetching content for sentiment analysis...")
             news_article = Article(article_url)
             news_article.download()
             news_article.parse()
             related_content = news_article.text if news_article.text else ""
-            print(f"     ✅ Content fetched: {len(related_content)} chars")
+            # # print(f"     ✅ Content fetched: {len(related_content)} chars")
         except Exception as e:
-            print(f"     ❌ Failed to fetch content: {str(e)[:50]}...")
+            # # print(f"     ❌ Failed to fetch content: {str(e)[:50]}...")
             # Fallback to title + description
             related_content = f"{related_article.get('title', '')} {related_article.get('description', '')}"
     else:
@@ -43,7 +43,7 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
     
     # If no content available, skip analysis
     if not related_content.strip():
-        print(f"     ❌ No content available for sentiment analysis")
+        # # print(f"     ❌ No content available for sentiment analysis")
         return {
             'disagreement_score': 0,
             'sentiment_original': 'neutral',
@@ -86,7 +86,7 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
     """
     
     try:
-        print(f"     🤖 Sending to OpenAI for sentiment analysis...")
+        # # print(f"     🤖 Sending to OpenAI for sentiment analysis...")
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -96,7 +96,7 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
         )
         
         response_text = response.choices[0].message.content.strip()
-        print(f"     🤖 GPT-4 response: {response_text[:100]}...")
+        # # print(f"     🤖 GPT-4 response: {response_text[:100]}...")
         
         # Clean response text - remove markdown code blocks if present
         cleaned_response = response_text
@@ -117,29 +117,29 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
         # Remove any remaining markdown artifacts
         cleaned_response = cleaned_response.strip()
         
-        print(f"     🧹 Cleaned response: {cleaned_response[:100]}...")
+        # # print(f"     🧹 Cleaned response: {cleaned_response[:100]}...")
         
         # Parse JSON response
         import json
         try:
             sentiment_data = json.loads(cleaned_response)
-            print(f"     ✅ Sentiment analysis completed:")
-            print(f"        📊 Disagreement score: {sentiment_data.get('disagreement_score', 0)}")
-            print(f"        🎭 Original sentiment: {sentiment_data.get('sentiment_original', 'neutral')}")
-            print(f"        🎭 Related sentiment: {sentiment_data.get('sentiment_related', 'neutral')}")
-            print(f"        📈 Disagreement level: {sentiment_data.get('disagreement_level', 'unknown')}")
-            print(f"        🧠 Confidence: {sentiment_data.get('confidence', 0)}%")
-            print(f"        💭 Analysis summary: {sentiment_data.get('analysis_summary', 'No summary')}")
-            print(f"        📝 Reason: {sentiment_data.get('reason', 'No reason provided')}...")
+            # # print(f"     ✅ Sentiment analysis completed:")
+            # # print(f"        📊 Disagreement score: {sentiment_data.get('disagreement_score', 0)}")
+            # # print(f"        🎭 Original sentiment: {sentiment_data.get('sentiment_original', 'neutral')}")
+            # # print(f"        🎭 Related sentiment: {sentiment_data.get('sentiment_related', 'neutral')}")
+            # # print(f"        📈 Disagreement level: {sentiment_data.get('disagreement_level', 'unknown')}")
+            # # print(f"        🧠 Confidence: {sentiment_data.get('confidence', 0)}%")
+            # # print(f"        💭 Analysis summary: {sentiment_data.get('analysis_summary', 'No summary')}")
+            # # print(f"        📝 Reason: {sentiment_data.get('reason', 'No reason provided')}...")
             return sentiment_data
             
         except json.JSONDecodeError as e:
-            print(f"     ❌ Failed to parse JSON response, extracting manually...")
-            print(f"     🔍 JSON Error: {str(e)}")
-            print(f"     📄 Full response for debugging:")
-            print(f"     {response_text}")
-            print(f"     🧹 Cleaned response for debugging:")
-            print(f"     {cleaned_response}")
+            # # print(f"     ❌ Failed to parse JSON response, extracting manually...")
+            # # print(f"     🔍 JSON Error: {str(e)}")
+            # # print(f"     📄 Full response for debugging:")
+            # # print(f"     {response_text}")
+            # # print(f"     🧹 Cleaned response for debugging:")
+            # # print(f"     {cleaned_response}")
             
             # Fallback parsing
             lines = response_text.split('\n')
@@ -163,7 +163,7 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
             }
             
     except Exception as e:
-        print(f"     ❌ Error in sentiment analysis: {str(e)[:100]}...")
+        # # print(f"     ❌ Error in sentiment analysis: {str(e)[:100]}...")
         return {
             'disagreement_score': 0,
             'sentiment_original': 'neutral',
@@ -182,11 +182,11 @@ def calculate_article_similarity(article, keywords, target_date, article_date):
     article_title = (article.get('title') or '').lower()
     article_desc = (article.get('description') or '').lower()
     
-    print(f"  🔍 Analyzing: {article.get('title', 'No title')[:60]}...")
-    print(f"     Keywords to match: {keywords}")
+    # # print(f"  🔍 Analyzing: {article.get('title', 'No title')[:60]}...")
+    # # print(f"     Keywords to match: {keywords}")
     
     if not article_title and not article_desc:
-        print(f"     ❌ No title or description found")
+        # # print(f"     ❌ No title or description found")
         return 0
     
     # Initialize scores
@@ -201,22 +201,23 @@ def calculate_article_similarity(article, keywords, target_date, article_date):
     article_url = article.get('link')
     if article_url:
         try:
-            print(f"     📰 Fetching full content from: {article_url[:50]}...")
+            # # print(f"     📰 Fetching full content from: {article_url[:50]}...")
             news_article = Article(article_url)
             news_article.download()
             news_article.parse()
             full_content = news_article.text.lower() if news_article.text else ""
-            print(f"     ✅ Content fetched: {len(full_content)} chars")
+            # # print(f"     ✅ Content fetched: {len(full_content)} chars")
         except Exception as e:
-            print(f"     ❌ Failed to fetch content: {str(e)[:50]}...")
+            # # print(f"     ❌ Failed to fetch content: {str(e)[:50]}...")
             full_content = ""
     else:
-        print(f"     ⚠️  No URL provided for content fetching")
+        # # print(f"     ⚠️  No URL provided for content fetching")
+        pass
     
     # Calculate keyword matches
     for keyword in keywords:
         keyword_lower = str(keyword).lower()
-        print(f"     🔎 Checking keyword: '{keyword_lower}'")
+        # # print(f"     🔎 Checking keyword: '{keyword_lower}'")
         
         # Title matches (weighted higher)
         if article_title:
@@ -225,13 +226,14 @@ def calculate_article_similarity(article, keywords, target_date, article_date):
                 if re.search(r'\b' + re.escape(keyword_lower) + r'\b', article_title):
                     title_score += 1
                     exact_matches += 1
-                    print(f"        ✅ Title EXACT match: +1.0 point")
+                    # # print(f"        ✅ Title EXACT match: +1.0 point")
                 else:
                     title_score += 0.5
                     partial_matches += 1
-                    print(f"        ⚡ Title partial match: +0.5 point")
+                    # # print(f"        ⚡ Title partial match: +0.5 point")
             else:
-                print(f"        ❌ No title match")
+                # # print(f"        ❌ No title match")
+                pass
         
         # Description matches
         if article_desc:
@@ -239,13 +241,14 @@ def calculate_article_similarity(article, keywords, target_date, article_date):
                 if re.search(r'\b' + re.escape(keyword_lower) + r'\b', article_desc):
                     desc_score += 1
                     exact_matches += 0.5  # Less weight for desc exact matches
-                    print(f"        ✅ Description EXACT match: +1.0 point")
+                    # # print(f"        ✅ Description EXACT match: +1.0 point")
                 else:
                     desc_score += 0.5
                     partial_matches += 0.5
-                    print(f"        ⚡ Description partial match: +0.5 point")
+                    # # print(f"        ⚡ Description partial match: +0.5 point")
             else:
-                print(f"        ❌ No description match")
+                # # print(f"        ❌ No description match")
+                pass
         
         # Full content matches (if available)
         if full_content:
@@ -257,13 +260,16 @@ def calculate_article_similarity(article, keywords, target_date, article_date):
                     content_points = min(exact_content_matches * 0.5, 2.0)  # Max 2 points per keyword
                     content_score += content_points
                     exact_matches += min(exact_content_matches * 0.2, 0.5)  # Small bonus for content matches
-                    print(f"        ✅ Content matches: {exact_content_matches}x = +{content_points} points")
+                    # # print(f"        ✅ Content matches: {exact_content_matches}x = +{content_points} points")
                 else:
-                    print(f"        ⚡ Content partial match found")
+                    # # print(f"        ⚡ Content partial match found")
+                    pass
             else:
-                print(f"        ❌ No content match")
+                # # print(f"        ❌ No content match")
+                pass
         else:
-            print(f"        ⚠️  No content available for analysis")
+            # # print(f"        ⚠️  No content available for analysis")
+            pass
     
     # Calculate weighted score
     total_keywords = len(keywords)
@@ -274,8 +280,8 @@ def calculate_article_similarity(article, keywords, target_date, article_date):
     content_component = (content_score / total_keywords) * 25  # Content weight: 25% (new component)
     exact_bonus = (exact_matches / total_keywords) * 10   # Exact match bonus: 10%
     
-    print(f"     📊 Raw scores - Title: {title_score}, Desc: {desc_score}, Content: {content_score}, Exact: {exact_matches}")
-    print(f"     🧮 Weighted scores - Title: {title_component:.1f}, Desc: {desc_component:.1f}, Content: {content_component:.1f}, Bonus: {exact_bonus:.1f}")
+    # # print(f"     📊 Raw scores - Title: {title_score}, Desc: {desc_score}, Content: {content_score}, Exact: {exact_matches}")
+    # # print(f"     🧮 Weighted scores - Title: {title_component:.1f}, Desc: {desc_component:.1f}, Content: {content_component:.1f}, Bonus: {exact_bonus:.1f}")
     
     # Date proximity bonus (expanded range)
     date_bonus = 0
@@ -283,26 +289,28 @@ def calculate_article_similarity(article, keywords, target_date, article_date):
         date_diff = abs((article_date - target_date).days)
         if date_diff == 0:
             date_bonus = 10  # Same day bonus
-            print(f"     📅 Date bonus: +{date_bonus} (same day)")
+            # # print(f"     📅 Date bonus: +{date_bonus} (same day)")
         elif date_diff <= 1:
             date_bonus = 8   # Within 1 day bonus
-            print(f"     📅 Date bonus: +{date_bonus} (±1 day)")
+            # # print(f"     📅 Date bonus: +{date_bonus} (±1 day)")
         elif date_diff <= 3:
             date_bonus = 5   # Within 3 days bonus
-            print(f"     📅 Date bonus: +{date_bonus} (±{date_diff} days)")
+            # # print(f"     📅 Date bonus: +{date_bonus} (±{date_diff} days)")
         elif date_diff <= 7:
             date_bonus = 3   # Within 1 week bonus
-            print(f"     📅 Date bonus: +{date_bonus} (±{date_diff} days)")
+            # # print(f"     📅 Date bonus: +{date_bonus} (±{date_diff} days)")
         else:
-            print(f"     📅 No date bonus (±{date_diff} days)")
+            # # print(f"     📅 No date bonus (±{date_diff} days)")
+            pass
     else:
-        print(f"     📅 No date comparison available")
+        # # print(f"     📅 No date comparison available")
+        pass
     
     # Final score
     final_score = title_component + desc_component + content_component + exact_bonus + date_bonus
     capped_score = min(final_score, 100)  # Cap at 100
     
-    print(f"     🏆 Final score: {final_score:.1f} (capped: {capped_score:.1f})")
+    # # print(f"     🏆 Final score: {final_score:.1f} (capped: {capped_score:.1f})")
     
     # Store analysis details for debugging
     article['analysis_details'] = {
@@ -355,22 +363,22 @@ def find_related_news(keywords, publish_date, original_url=None, original_text=N
             selected_keywords.append(keyword_str)
             query_length += additional_length
         else:
-            print(f"⚠️  Skipping keyword '{keyword_str}' - would exceed 100 char limit")
+            # # print(f"⚠️  Skipping keyword '{keyword_str}' - would exceed 100 char limit")
             break
     
     search_query = " OR ".join(selected_keywords) if len(selected_keywords) > 1 else selected_keywords[0] if selected_keywords else ""
     
-    print(f"🔍 Query constructed: '{search_query}' (length: {len(search_query)})")
+    # # print(f"🔍 Query constructed: '{search_query}' (length: {len(search_query)})")
     
     if not search_query:
-        print(f"❌ No valid search query could be constructed")
+        # # print(f"❌ No valid search query could be constructed")
         return []
     
     if len(search_query) > 100:
         # Fallback: use only the first keyword if still too long
         search_query = selected_keywords[0] if selected_keywords else keywords[0]
         selected_keywords = [search_query]
-        print(f"⚠️  Query still too long, using single keyword: '{search_query}'")
+        # # print(f"⚠️  Query still too long, using single keyword: '{search_query}'")
     
     # Use regular news endpoint
     url = "https://newsdata.io/api/1/news"
@@ -379,42 +387,42 @@ def find_related_news(keywords, publish_date, original_url=None, original_text=N
         "q": search_query,
     }
 
-    print(f"🔍 Searching for related news with keywords: {selected_keywords}")
-    print(f"📅 Target date for filtering: {target_date}")
-    print(f"🌐 API URL: {url}")
-    print(f"📋 Query parameters: {params}")
+    # # print(f"🔍 Searching for related news with keywords: {selected_keywords}")
+    # # print(f"📅 Target date for filtering: {target_date}")
+    # # print(f"🌐 API URL: {url}")
+    # # print(f"📋 Query parameters: {params}")
     
     try:
         response = requests.get(url, params=params)
-        print(f"📞 Request URL: {response.url}")
-        print(f"📊 Response status: {response.status_code}")
+        # # print(f"📞 Request URL: {response.url}")
+        # # print(f"📊 Response status: {response.status_code}")
         response.raise_for_status()
         data = response.json()
         results = data.get("results", [])
-        print(f"📰 Initial results count: {len(results)}")
+        # # print(f"📰 Initial results count: {len(results)}")
         
         # If no results, try with global language
         if not results:
-            print(f"⚠️  No results found, trying with global English...")
+            # # print(f"⚠️  No results found, trying with global English...")
             params["language"] = "en"
             response = requests.get(url, params=params)
-            print(f"📞 Fallback request URL: {response.url}")
+            # # print(f"📞 Fallback request URL: {response.url}")
             response.raise_for_status()
             data = response.json()
             results = data.get("results", [])
-            print(f"📰 Fallback results count: {len(results)}")
+            # # print(f"📰 Fallback results count: {len(results)}")
         
         # Filter and score results with improved algorithm
         filtered_results = []
         
-        print(f"🧮 Starting similarity analysis for {len(results)} articles...")
+        # # print(f"🧮 Starting similarity analysis for {len(results)} articles...")
         for i, article in enumerate(results, 1):
-            print(f"\n📄 Article {i}/{len(results)}:")
+            # # print(f"\n📄 Article {i}/{len(results)}:")
             
             # Skip if this is the same article (check URL)
             article_url = article.get('link', '')
             if original_url and article_url and article_url.strip() == original_url.strip():
-                print(f"  🔄 SKIPPING: This is the original article being analyzed")
+                # # print(f"  🔄 SKIPPING: This is the original article being analyzed")
                 continue
             
             # Parse article date
@@ -423,16 +431,17 @@ def find_related_news(keywords, publish_date, original_url=None, original_text=N
             if pub_date:
                 try:
                     article_date = datetime.fromisoformat(pub_date.replace('Z', '+00:00'))
-                    print(f"  📅 Article date: {article_date.strftime('%Y-%m-%d')}")
+                    # # print(f"  📅 Article date: {article_date.strftime('%Y-%m-%d')}")
                 except:
                     try:
                         article_date = datetime.strptime(pub_date[:10], '%Y-%m-%d')
-                        print(f"  📅 Article date: {article_date.strftime('%Y-%m-%d')}")
+                        # # print(f"  📅 Article date: {article_date.strftime('%Y-%m-%d')}")
                     except:
-                        print(f"  ⚠️  Could not parse date: {pub_date}")
+                        # # print(f"  ⚠️  Could not parse date: {pub_date}")
                         pass  # Don't skip, just no date bonus
             else:
-                print(f"  ❌ No publication date available")
+                # # print(f"  ❌ No publication date available")
+                pass
             
             # Calculate advanced similarity score
             score = calculate_article_similarity(article, selected_keywords, target_date, article_date)
@@ -445,24 +454,25 @@ def find_related_news(keywords, publish_date, original_url=None, original_text=N
             else:
                 min_score = 20  # Lower threshold for few keywords
             
-            print(f"  🎯 Score: {score:.1f} (threshold: {min_score})")
+            # # print(f"  🎯 Score: {score:.1f} (threshold: {min_score})")
             
             if score >= min_score:
                 article['similarity_score'] = round(score, 1)
                 article['is_recent'] = article_date and target_date and abs((article_date - target_date).days) <= 3  # Expanded from 1 to 3 days
                 filtered_results.append(article)
-                print(f"  ✅ Article ACCEPTED (score >= {min_score})")
+                # # print(f"  ✅ Article ACCEPTED (score >= {min_score})")
             else:
-                print(f"  ❌ Article REJECTED (score < {min_score})")
+                # # print(f"  ❌ Article REJECTED (score < {min_score})")
+                pass
         
         # Apply sentiment analysis if original text is provided
         if original_text and filtered_results:
-            print(f"\n🎭 Starting sentiment analysis for disagreement sorting...")
-            print(f"📊 Analyzing {len(filtered_results)} articles for sentiment disagreement...")
+            # # print(f"\n🎭 Starting sentiment analysis for disagreement sorting...")
+            # # print(f"📊 Analyzing {len(filtered_results)} articles for sentiment disagreement...")
             
             for i, article in enumerate(filtered_results, 1):
                 try:
-                    print(f"\n🎭 Article {i}/{len(filtered_results)}: {article.get('title', 'Unknown')[:50]}...")
+                    # # print(f"\n🎭 Article {i}/{len(filtered_results)}: {article.get('title', 'Unknown')[:50]}...")
                     
                     # Perform sentiment analysis
                     sentiment_data = analyze_sentiment_disagreement(original_text, article, selected_keywords)
@@ -470,50 +480,52 @@ def find_related_news(keywords, publish_date, original_url=None, original_text=N
                     if sentiment_data:
                         article['disagreement_score'] = sentiment_data.get('disagreement_score', 50)
                         article['sentiment_analysis'] = sentiment_data
-                        print(f"   ✅ Disagreement score: {article['disagreement_score']}%")
+                        # # print(f"   ✅ Disagreement score: {article['disagreement_score']}%")
                     else:
                         # Default neutral score if analysis fails
                         article['disagreement_score'] = 50
-                        print(f"   ⚠️ Using default neutral score (50%)")
+                        # # print(f"   ⚠️ Using default neutral score (50%)")
                         
                 except Exception as e:
-                    print(f"   ❌ Sentiment analysis failed: {str(e)[:50]}...")
+                    # # print(f"   ❌ Sentiment analysis failed: {str(e)[:50]}...")
                     article['disagreement_score'] = 50  # Default neutral
             
             # Sort by disagreement score (highest disagreement first)
-            print(f"\n� Sorting {len(filtered_results)} articles by disagreement score...")
+            # # print(f"\n📊 Sorting {len(filtered_results)} articles by disagreement score...")
             filtered_results.sort(key=lambda x: x.get('disagreement_score', 50), reverse=True)
             
             # Show sorted results
-            print(f"🏆 Articles sorted by disagreement (highest first):")
+            # # print(f"🏆 Articles sorted by disagreement (highest first):")
             for i, article in enumerate(filtered_results[:5]):  # Show top 5
                 score = article.get('disagreement_score', 50)
                 sim_score = article.get('similarity_score', 0)
                 title = article.get('title', 'Unknown')[:40]
-                print(f"   {i+1}. [{score}% disagreement, {sim_score} similarity] {title}...")
+                # # print(f"   {i+1}. [{score}% disagreement, {sim_score} similarity] {title}...")
         
         else:
             # Fallback sorting by similarity score if no original text
-            print(f"\n📈 Sorting {len(filtered_results)} articles by similarity score (no sentiment analysis)...")
+            # # print(f"\n📈 Sorting {len(filtered_results)} articles by similarity score (no sentiment analysis)...")
             filtered_results.sort(key=lambda x: (x.get('is_recent', False), x.get('similarity_score', 0)), reverse=True)
             
             # Show sorted results
-            print(f"🏆 Articles sorted by similarity:")
+            # # print(f"🏆 Articles sorted by similarity:")
             for i, article in enumerate(filtered_results[:5]):  # Show top 5
                 score = article.get('similarity_score', 0)
                 recent = article.get('is_recent', False)
                 title = article.get('title', 'Unknown')[:40]
-                print(f"   {i+1}. [{score} similarity] {'⏰' if recent else '🕐'} {title}...")
+                # # print(f"   {i+1}. [{score} similarity] {'⏰' if recent else '🕐'} {title}...")
         
         # Debug logging
-        print(f"\n🏆 FINAL RESULTS:")
-        print(f"Found {len(filtered_results)} related articles")
+        # # print(f"\n🏆 FINAL RESULTS:")
+        # # print(f"Found {len(filtered_results)} related articles")
         if original_text:
-            print(f"📊 Sorted by: Disagreement Score (sentiment analysis)")
+            # # print(f"📊 Sorted by: Disagreement Score (sentiment analysis)")
+            pass
         else:
-            print(f"📊 Sorted by: Similarity Score + Recency")
+            # # print(f"📊 Sorted by: Similarity Score + Recency")
+            pass
         
-        print(f"🎯 Returning top {limit} results\n")
+        # # print(f"🎯 Returning top {limit} results\n")
         
         # Store selected keywords info in the results for reference
         if filtered_results:
@@ -526,17 +538,17 @@ def find_related_news(keywords, publish_date, original_url=None, original_text=N
         return filtered_results[:limit]
         
     except requests.exceptions.RequestException as e:
-        print(f"❌ ERROR finding related news: {e}")
-        print(f"🔧 Check API key and network connection")
+        # # print(f"❌ ERROR finding related news: {e}")
+        # # print(f"🔧 Check API key and network connection")
         return []
 
 
 def generate_comparative_summary(original_article, related_articles):
     """Generate a comparative summary using ChatGPT for the original article and top disagreeing articles"""
     
-    print(f"\n📝 Starting comparative summary generation...")
-    print(f"📰 Original article: {original_article.get('title', 'No title')}...")
-    print(f"📊 Related articles to analyze: {len(related_articles)}")
+    # # print(f"\n📝 Starting comparative summary generation...")
+    # # print(f"📰 Original article: {original_article.get('title', 'No title')}...")
+    # # print(f"📊 Related articles to analyze: {len(related_articles)}")
     
     if not related_articles:
         return {
@@ -606,8 +618,8 @@ def generate_comparative_summary(original_article, related_articles):
     """
     
     try:
-        print(f"🤖 Sending to ChatGPT for comparative analysis...")
-        print(f"📏 Total content length: {len(articles_text)} characters")
+        # # print(f"🤖 Sending to ChatGPT for comparative analysis...")
+        # # print(f"📏 Total content length: {len(articles_text)} characters")
         
         response = client.chat.completions.create(
             model="gpt-4o",
@@ -619,8 +631,8 @@ def generate_comparative_summary(original_article, related_articles):
         )
         
         summary_text = response.choices[0].message.content.strip()
-        print(f"✅ Comparative analysis generated successfully")
-        print(f"📄 Summary length: {len(summary_text)} characters")
+        # # print(f"✅ Comparative analysis generated successfully")
+        # # print(f"📄 Summary length: {len(summary_text)} characters")
         
         # Parse the response into structured data
         sections = {}
@@ -657,7 +669,7 @@ def generate_comparative_summary(original_article, related_articles):
         }
         
     except Exception as e:
-        print(f"❌ Error generating comparative summary: {str(e)}")
+        # # print(f"❌ Error generating comparative summary: {str(e)}")
         return {
             'full_summary': f'Error generating summary: {str(e)}',
             'sections': {},
@@ -668,19 +680,19 @@ def generate_comparative_summary(original_article, related_articles):
 
 def analyze_news_url(url, manual_publish_date=None):
     """Analyze a news article from URL and find related news"""
-    print(f"\n🚀 Starting URL analysis for: {url}")
+    # # print(f"\n🚀 Starting URL analysis for: {url}")
     try:
         # Download and parse the article
-        print(f"📰 Downloading article content...")
+        # # print(f"📰 Downloading article content...")
         article = Article(url)
         article.download()
         article.parse()
         
-        print(f"✅ Article parsed successfully:")
-        print(f"  📰 Title: {article.title}")
-        print(f"  📅 Publish date: {article.publish_date}")
-        print(f"  👥 Authors: {article.authors}")
-        print(f"  📝 Text length: {len(article.text)} characters")
+        # # print(f"✅ Article parsed successfully:")
+        # # print(f"  📰 Title: {article.title}")
+        # # print(f"  📅 Publish date: {article.publish_date}")
+        # # print(f"  👥 Authors: {article.authors}")
+        # # print(f"  📝 Text length: {len(article.text)} characters")
         
         # Use manual publish date if provided, otherwise use article's publish date
         final_publish_date = None
@@ -688,22 +700,22 @@ def analyze_news_url(url, manual_publish_date=None):
             try:
                 # Parse manual date string to datetime object
                 final_publish_date = datetime.strptime(manual_publish_date, '%Y-%m-%d')
-                print(f"  🗓️  Using manual publish date: {final_publish_date}")
+                # # print(f"  🗓️  Using manual publish date: {final_publish_date}")
             except ValueError:
-                print(f"  ⚠️  Invalid manual date format, using article date")
+                # # print(f"  ⚠️  Invalid manual date format, using article date")
                 final_publish_date = article.publish_date
         else:
             final_publish_date = article.publish_date
-            print(f"  📅 Using article's publish date: {final_publish_date}")
+            # # print(f"  📅 Using article's publish date: {final_publish_date}")
         
         # Extract keywords using the analyzer
-        print(f"🔍 Extracting keywords from article text...")
+        # # print(f"🔍 Extracting keywords from article text...")
         keywords = get_keywords(article.text)
         keywords_list = keywords if isinstance(keywords, list) else [str(keywords)]
-        print(f"🏷️  Keywords extracted: {keywords_list}")
+        # # print(f"🏷️  Keywords extracted: {keywords_list}")
         
         # Find related news based on keywords and date (no sentiment analysis for speed)
-        print(f"🔗 Finding related news...")
+        # # print(f"🔗 Finding related news...")
         related_news = find_related_news(
             keywords_list, 
             final_publish_date, 
@@ -720,10 +732,10 @@ def analyze_news_url(url, manual_publish_date=None):
             if 'search_keywords_used' in first_result_analysis:
                 search_keywords_used = first_result_analysis['search_keywords_used']
         
-        print(f"✅ Analysis completed successfully!")
-        print(f"📊 Results summary:")
-        print(f"  🏷️  Keywords found: {len(keywords_list)}")
-        print(f"  📰 Related articles: {len(related_news)}")
+        # # print(f"✅ Analysis completed successfully!")
+        # # print(f"📊 Results summary:")
+        # # print(f"  🏷️  Keywords found: {len(keywords_list)}")
+        # # print(f"  📰 Related articles: {len(related_news)}")
         
         # Return structured data
         return {
@@ -759,8 +771,8 @@ def analyze_news_url(url, manual_publish_date=None):
         }
         
     except Exception as e:
-        print(f"❌ Error analyzing URL {url}: {e}")
-        print(f"🔧 Check URL validity and network connection")
+        # # print(f"❌ Error analyzing URL {url}: {e}")
+        # # print(f"🔧 Check URL validity and network connection")
         return {
             'url': url,
             'title': 'Error analyzing article',
@@ -795,24 +807,24 @@ def analyze_url_api(request):
     news_url = request.GET.get('url', '')
     publish_date = request.GET.get('publish_date', '')  # Get manual publish date
     
-    print(f"\n🌐 API Request received:")
-    print(f"   📍 URL to analyze: {news_url}")
-    print(f"   📅 Manual publish date: {publish_date if publish_date else 'Not provided'}")
-    print(f"   🔧 Request method: {request.method}")
-    print(f"   📊 All GET parameters: {dict(request.GET)}")
+    # # print(f"\n🌐 API Request received:")
+    # # print(f"   📍 URL to analyze: {news_url}")
+    # # print(f"   📅 Manual publish date: {publish_date if publish_date else 'Not provided'}")
+    # # print(f"   🔧 Request method: {request.method}")
+    # # print(f"   📊 All GET parameters: {dict(request.GET)}")
     
     if not news_url:
-        print(f"❌ No URL provided in request")
+        # # print(f"❌ No URL provided in request")
         return JsonResponse({
             'success': False,
             'error': 'No URL provided'
         })
     
     # Analyze the URL with optional manual publish date
-    print(f"🚀 Starting URL analysis...")
+    # # print(f"🚀 Starting URL analysis...")
     analyzed_article = analyze_news_url(news_url, publish_date if publish_date else None)
     
-    print(f"✅ Analysis completed, sending response")
+    # # print(f"✅ Analysis completed, sending response")
     return JsonResponse({
         'success': True,
         'article': analyzed_article
@@ -820,9 +832,9 @@ def analyze_url_api(request):
 
 
 def get_keywords(page_string):
-    print(f"\n🤖 Starting keyword extraction...")
-    print(f"📝 Text length: {len(page_string)} characters")
-    print(f"📄 Text preview: {page_string[:200]}...")
+    # # print(f"\n🤖 Starting keyword extraction...")
+    # # print(f"📝 Text length: {len(page_string)} characters")
+    # # print(f"📄 Text preview: {page_string[:200]}...")
     
     reply = None
     user_input = """Here's a news article. i want you to extract the keywords from it to a csv string format.
@@ -837,7 +849,7 @@ def get_keywords(page_string):
                     here's the article:\n{}""".format(page_string)
     
     try:
-        print(f"🔄 Sending request to OpenAI GPT-4o...")
+        # # print(f"🔄 Sending request to OpenAI GPT-4o...")
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -846,21 +858,21 @@ def get_keywords(page_string):
         )
         
         reply = str(response.choices[0].message.content.strip())
-        print(f"🤖 OpenAI raw response: {reply}")
+        # # print(f"🤖 OpenAI raw response: {reply}")
         
         reply = reply.replace("'", "").replace('"', '').replace("\n", "")
-        print(f"🧹 Cleaned response: {reply}")
+        # # print(f"🧹 Cleaned response: {reply}")
 
         # turn reply into a list of keywords
         keywords = [keyword.strip() for keyword in reply.split(',') if keyword.strip()]
-        print(f"🏷️  Final keywords list: {keywords}")
-        print(f"📊 Total keywords extracted: {len(keywords)}")
+        # # print(f"🏷️  Final keywords list: {keywords}")
+        # # print(f"📊 Total keywords extracted: {len(keywords)}")
 
         return keywords
         
     except Exception as e:
-        print(f"❌ Error in keyword extraction: {e}")
-        print(f"🔧 Falling back to empty keywords list")
+        # # print(f"❌ Error in keyword extraction: {e}")
+        # # print(f"🔧 Falling back to empty keywords list")
         return []
 
 
@@ -885,8 +897,8 @@ def ai_comparison_api(request):
                 'error': 'article_url and related_articles are required'
             }, status=400)
         
-        print(f"🤖 Generating AI comparison for: {article_title}")
-        print(f"📰 Analyzing {len(related_articles)} related articles")
+        # print(f"🤖 Generating AI comparison for: {article_title}")
+        # print(f"📰 Analyzing {len(related_articles)} related articles")
         
         # Prepare original article data for analysis
         original_article = {
@@ -897,7 +909,7 @@ def ai_comparison_api(request):
         
         # Convert related articles to proper format and add sentiment analysis
         formatted_related_articles = []
-        print(f"🎭 Starting sentiment analysis for AI comparison...")
+        # print(f"🎭 Starting sentiment analysis for AI comparison...")
         
         for i, article in enumerate(related_articles):
             formatted_article = {
@@ -912,7 +924,7 @@ def ai_comparison_api(request):
             # Perform sentiment analysis for AI comparison
             if article_text:  # Only if we have original article text
                 try:
-                    print(f"   🎭 Analyzing article {i+1}/{len(related_articles)}: {article.get('title', '')[:40]}...")
+                    # print(f"   🎭 Analyzing article {i+1}/{len(related_articles)}: {article.get('title', '')[:40]}...")
                     
                     # Use simplified keywords for sentiment analysis
                     keywords = [article_title] if article_title else []
@@ -922,16 +934,16 @@ def ai_comparison_api(request):
                         formatted_article['sentiment_analysis'] = sentiment_data
                         formatted_article['disagreement_score'] = sentiment_data.get('disagreement_score', 50)
                         reason = sentiment_data.get('reason', 'No reason provided')
-                        print(f"      ✅ Disagreement score: {sentiment_data.get('disagreement_score', 50)}%")
-                        print(f"      💭 Reason: {reason}...")
-                        print(f"      🎭 Sentiments: {sentiment_data.get('sentiment_original', 'neutral')} vs {sentiment_data.get('sentiment_related', 'neutral')}")
+                        # print(f"      ✅ Disagreement score: {sentiment_data.get('disagreement_score', 50)}%")
+                        # print(f"      💭 Reason: {reason}...")
+                        # print(f"      🎭 Sentiments: {sentiment_data.get('sentiment_original', 'neutral')} vs {sentiment_data.get('sentiment_related', 'neutral')}")
                     else:
                         formatted_article['disagreement_score'] = 50
-                        print(f"      ⚠️ Using default neutral score")
+                        # print(f"      ⚠️ Using default neutral score")
                         
                 except Exception as e:
-                    print(f"      ❌ Sentiment analysis failed: {str(e)[:50]}...")
-                    print(f"      🔄 Using default disagreement score of 50%")
+                    # print(f"      ❌ Sentiment analysis failed: {str(e)[:50]}...")
+                    # print(f"      🔄 Using default disagreement score of 50%")
                     formatted_article['disagreement_score'] = 50
                     formatted_article['sentiment_analysis'] = {
                         'disagreement_score': 50,
@@ -949,7 +961,7 @@ def ai_comparison_api(request):
         
         # Sort by disagreement score for AI comparison
         formatted_related_articles.sort(key=lambda x: x.get('disagreement_score', 50), reverse=True)
-        print(f"   📊 Articles sorted by disagreement for AI comparison")
+        # print(f"   📊 Articles sorted by disagreement for AI comparison")
         
         # Use existing generate_comparative_summary function
         comparative_summary = generate_comparative_summary(
@@ -958,13 +970,13 @@ def ai_comparison_api(request):
         )
         
         if comparative_summary:
-            print(f"✅ AI comparison completed successfully!")
+            # print(f"✅ AI comparison completed successfully!")
             return JsonResponse({
                 'success': True,
                 'comparison': comparative_summary
             })
         else:
-            print(f"⚠️ AI comparison returned empty result")
+            # print(f"⚠️ AI comparison returned empty result")
             # Return a basic analysis instead of failing
             basic_analysis = {
                 'articles_analyzed': len(related_articles),
@@ -984,7 +996,7 @@ def ai_comparison_api(request):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     except Exception as e:
-        print(f"❌ Error in AI comparison: {str(e)}")
+        # print(f"❌ Error in AI comparison: {str(e)}")
         import traceback
         traceback.print_exc()
         
@@ -997,31 +1009,31 @@ def ai_comparison_api(request):
 # Image news analyzer
 def analyze_ocr_text(ocr_text, manual_publish_date=None):
     """Analyze OCR extracted text (headlines/snippets) and find related news"""
-    print(f"\n🔍 Starting OCR text analysis...")
-    print(f"📝 OCR text: {ocr_text[:200]}...")
+    # print(f"\n🔍 Starting OCR text analysis...")
+    # print(f"📝 OCR text: {ocr_text[:200]}...")
     
     try:
         # Extract keywords from OCR text
-        print(f"🏷️ Extracting keywords from OCR text...")
+        # print(f"🏷️ Extracting keywords from OCR text...")
         keywords = get_keywords(ocr_text)
         keywords_list = keywords if isinstance(keywords, list) else [str(keywords)]
-        print(f"🔑 Keywords extracted: {keywords_list}")
+        # print(f"🔑 Keywords extracted: {keywords_list}")
         
         # Use manual date if provided, otherwise use current date
         target_date = None
         if manual_publish_date:
             try:
                 target_date = datetime.strptime(manual_publish_date, '%Y-%m-%d')
-                print(f"📅 Using manual date: {target_date}")
+                # print(f"📅 Using manual date: {target_date}")
             except ValueError:
                 target_date = datetime.now()
-                print(f"⚠️ Invalid date format, using today: {target_date}")
+                # print(f"⚠️ Invalid date format, using today: {target_date}")
         else:
             target_date = datetime.now()
-            print(f"📅 Using current date: {target_date}")
+            # print(f"📅 Using current date: {target_date}")
         
         # Find related news (no sentiment analysis since we lack full original content)
-        print(f"🔗 Finding related news for OCR content...")
+        # print(f"🔗 Finding related news for OCR content...")
         related_news = find_related_news(
             keywords_list, 
             target_date, 
@@ -1031,11 +1043,11 @@ def analyze_ocr_text(ocr_text, manual_publish_date=None):
         )
         
         # Generate summary of related articles instead of sentiment comparison
-        print(f"📄 Generating content summary for {len(related_news)} articles...")
+        # print(f"📄 Generating content summary for {len(related_news)} articles...")
         content_summary = generate_ocr_content_summary(ocr_text, related_news, keywords_list)
         
-        print(f"✅ OCR analysis completed!")
-        print(f"📊 Results: {len(related_news)} related articles found")
+        # print(f"✅ OCR analysis completed!")
+        # print(f"📊 Results: {len(related_news)} related articles found")
         
         return {
             'ocr_text': ocr_text,
@@ -1056,7 +1068,7 @@ def analyze_ocr_text(ocr_text, manual_publish_date=None):
         }
         
     except Exception as e:
-        print(f"❌ Error in OCR analysis: {e}")
+        # print(f"❌ Error in OCR analysis: {e}")
         return {
             'ocr_text': ocr_text,
             'keywords': [],
@@ -1070,9 +1082,9 @@ def analyze_ocr_text(ocr_text, manual_publish_date=None):
 def generate_ocr_content_summary(ocr_text, related_articles, keywords):
     """Generate content summary for OCR analysis since we can't do sentiment comparison"""
     
-    print(f"\n📝 Generating OCR content summary...")
-    print(f"📰 OCR text: {ocr_text[:100]}...")
-    print(f"📊 Related articles: {len(related_articles)}")
+    # print(f"\n📝 Generating OCR content summary...")
+    # print(f"📰 OCR text: {ocr_text[:100]}...")
+    # print(f"📊 Related articles: {len(related_articles)}")
     
     if not related_articles:
         return {
@@ -1097,14 +1109,14 @@ def generate_ocr_content_summary(ocr_text, related_articles, keywords):
         article_url = article.get('link')
         if article_url:
             try:
-                print(f"  📰 Fetching content for article {i}: {title[:40]}...")
+                # print(f"  📰 Fetching content for article {i}: {title[:40]}...")
                 news_article = Article(article_url)
                 news_article.download()
                 news_article.parse()
                 article_content = news_article.text[:1500] if news_article.text else ""
-                print(f"    ✅ Content fetched: {len(article_content)} chars")
+                # print(f"    ✅ Content fetched: {len(article_content)} chars")
             except Exception as e:
-                print(f"    ❌ Failed to fetch content: {str(e)[:30]}...")
+                # print(f"    ❌ Failed to fetch content: {str(e)[:30]}...")
                 article_content = f"{article.get('description', 'No description available')}"
         else:
             article_content = f"{article.get('description', 'No description available')}"
@@ -1141,8 +1153,8 @@ def generate_ocr_content_summary(ocr_text, related_articles, keywords):
     """
     
     try:
-        print(f"🤖 Sending to ChatGPT for content summary...")
-        print(f"📏 Content length: {len(articles_content)} characters")
+        # print(f"🤖 Sending to ChatGPT for content summary...")
+        # print(f"📏 Content length: {len(articles_content)} characters")
         
         response = client.chat.completions.create(
             model="gpt-4o",
@@ -1154,8 +1166,8 @@ def generate_ocr_content_summary(ocr_text, related_articles, keywords):
         )
         
         summary_text = response.choices[0].message.content.strip()
-        print(f"✅ Content summary generated successfully")
-        print(f"📄 Summary length: {len(summary_text)} characters")
+        # print(f"✅ Content summary generated successfully")
+        # print(f"📄 Summary length: {len(summary_text)} characters")
         
         # Parse sections like in the sentiment analysis
         sections = {}
@@ -1192,7 +1204,7 @@ def generate_ocr_content_summary(ocr_text, related_articles, keywords):
         }
         
     except Exception as e:
-        print(f"❌ Error generating content summary: {str(e)}")
+        # print(f"❌ Error generating content summary: {str(e)}")
         return {
             'full_summary': f'Error generating summary: {str(e)}',
             'sections': {},
@@ -1211,9 +1223,9 @@ def analyze_ocr_api(request):
         ocr_text = data.get('ocr_text', '').strip()
         publish_date = data.get('publish_date', '')
         
-        print(f"\n🌐 OCR API Request received:")
-        print(f"   📝 OCR text: {ocr_text[:100]}...")
-        print(f"   📅 Manual date: {publish_date if publish_date else 'Not provided'}")
+        # print(f"\n🌐 OCR API Request received:")
+        # print(f"   📝 OCR text: {ocr_text[:100]}...")
+        # print(f"   📅 Manual date: {publish_date if publish_date else 'Not provided'}")
         
         if not ocr_text:
             return JsonResponse({
@@ -1222,10 +1234,10 @@ def analyze_ocr_api(request):
             }, status=400)
         
         # Analyze OCR text
-        print(f"🚀 Starting OCR analysis...")
+        # print(f"🚀 Starting OCR analysis...")
         analysis_result = analyze_ocr_text(ocr_text, publish_date if publish_date else None)
         
-        print(f"✅ OCR analysis completed")
+        # print(f"✅ OCR analysis completed")
         return JsonResponse({
             'success': True,
             'analysis': analysis_result
@@ -1234,7 +1246,7 @@ def analyze_ocr_api(request):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     except Exception as e:
-        print(f"❌ Error in OCR analysis API: {str(e)}")
+        # print(f"❌ Error in OCR analysis API: {str(e)}")
         return JsonResponse({
             'success': False,
             'error': f'OCR analysis failed: {str(e)}'
@@ -1242,7 +1254,7 @@ def analyze_ocr_api(request):
 
 def extract_headline_from_image(image_file):
     """Extract headline from image using OpenAI Vision API"""
-    print(f"\n👁️ Starting image headline extraction with OpenAI Vision...")
+    # print(f"\n👁️ Starting image headline extraction with OpenAI Vision...")
     
     try:
         # Convert image to base64
@@ -1263,14 +1275,14 @@ def extract_headline_from_image(image_file):
             ratio = max_size / max(image.size)
             new_size = tuple(int(dim * ratio) for dim in image.size)
             image = image.resize(new_size, Image.Resampling.LANCZOS)
-            print(f"📏 Resized image to: {new_size}")
+            # print(f"📏 Resized image to: {new_size}")
         
         # Convert to base64
         buffer = io.BytesIO()
         image.save(buffer, format='JPEG', quality=85)
         image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
         
-        print(f"🖼️ Image processed, size: {len(image_base64)} characters")
+        # print(f"🖼️ Image processed, size: {len(image_base64)} characters")
         
         # Create prompt for headline extraction
         prompt = """
@@ -1298,7 +1310,7 @@ def extract_headline_from_image(image_file):
         """
         
         # Send to OpenAI Vision API
-        print(f"🤖 Sending to OpenAI Vision API...")
+        # print(f"🤖 Sending to OpenAI Vision API...")
         response = client.chat.completions.create(
             model="gpt-4o",  # GPT-4 with vision
             messages=[
@@ -1325,8 +1337,8 @@ def extract_headline_from_image(image_file):
         
         extracted_text = response.choices[0].message.content.strip()
         
-        print(f"✅ Headline extracted successfully:")
-        print(f"📰 Result: {extracted_text}")
+        # print(f"✅ Headline extracted successfully:")
+        # print(f"📰 Result: {extracted_text}")
         
         if extracted_text == "NO_HEADLINE_FOUND":
             return {
@@ -1353,7 +1365,7 @@ def extract_headline_from_image(image_file):
             }
         
     except Exception as e:
-        print(f"❌ Error in OpenAI Vision extraction: {str(e)}")
+        # print(f"❌ Error in OpenAI Vision extraction: {str(e)}")
         return {
             'success': False,
             'error': f'Vision API failed: {str(e)}',
@@ -1362,7 +1374,7 @@ def extract_headline_from_image(image_file):
 
 def analyze_image_headline(image_file, manual_publish_date=None):
     """Complete image analysis using OpenAI Vision + news analysis"""
-    print(f"\n🚀 Starting complete image headline analysis...")
+    # print(f"\n🚀 Starting complete image headline analysis...")
     
     # Step 1: Extract headline using Vision API
     extraction_result = extract_headline_from_image(image_file)
@@ -1385,15 +1397,15 @@ def analyze_image_headline(image_file, manual_publish_date=None):
             }
     
     headline_text = extraction_result['extracted_text']
-    print(f"📰 Extracted headline: {headline_text}")
+    # print(f"📰 Extracted headline: {headline_text}")
     
     # Step 2: Analyze the extracted headline (same as OCR analysis)
-    print(f"🔍 Starting news analysis for extracted headline...")
+    # print(f"🔍 Starting news analysis for extracted headline...")
     analysis_result = analyze_ocr_text(headline_text, manual_publish_date)
     
     # Step 3: Check if any related articles were found
     if not analysis_result.get('related_news') or len(analysis_result.get('related_news', [])) == 0:
-        print(f"❌ No related articles found for the extracted headline")
+        # print(f"❌ No related articles found for the extracted headline")
         return {
             'extraction_error': f'No related news articles found for: "{headline_text}". The text may be too specific, outdated, or not covered by major news sources.',
             'analysis_type': 'NO_ARTICLES_FOUND',
@@ -1421,9 +1433,9 @@ def analyze_image_api(request):
         image_file = request.FILES.get('image')
         publish_date = request.POST.get('publish_date', '')
         
-        print(f"\n🌐 Image API Request received:")
-        print(f"   🖼️ Image file: {image_file.name if image_file else 'Not provided'}")
-        print(f"   📅 Manual date: {publish_date if publish_date else 'Not provided'}")
+        # print(f"\n🌐 Image API Request received:")
+        # print(f"   🖼️ Image file: {image_file.name if image_file else 'Not provided'}")
+        # print(f"   📅 Manual date: {publish_date if publish_date else 'Not provided'}")
         
         if not image_file:
             return JsonResponse({
@@ -1432,7 +1444,7 @@ def analyze_image_api(request):
             }, status=400)
         
         # Analyze the image
-        print(f"🚀 Starting image analysis...")
+        # print(f"🚀 Starting image analysis...")
         analysis_result = analyze_image_headline(image_file, publish_date if publish_date else None)
         
         # Check for various error types
@@ -1440,7 +1452,7 @@ def analyze_image_api(request):
             analysis_type = analysis_result.get('analysis_type', 'UNKNOWN_ERROR')
             
             if analysis_type == 'TEXT_VALIDATION_ERROR':
-                print(f"❌ Text validation failed")
+                # print(f"❌ Text validation failed")
                 return JsonResponse({
                     'success': False,
                     'error': analysis_result['extraction_error'],
@@ -1449,7 +1461,7 @@ def analyze_image_api(request):
                 }, status=400)
             
             elif analysis_type == 'NO_ARTICLES_FOUND':
-                print(f"⚠️ No articles found for extracted text")
+                # print(f"⚠️ No articles found for extracted text")
                 return JsonResponse({
                     'success': False,
                     'error': analysis_result['extraction_error'],
@@ -1459,20 +1471,20 @@ def analyze_image_api(request):
                 }, status=404)
             
             else:
-                print(f"❌ Image extraction failed")
+                # print(f"❌ Image extraction failed")
                 return JsonResponse({
                     'success': False,
                     'error': analysis_result['extraction_error']
                 }, status=500)
         
-        print(f"✅ Image analysis completed successfully")
+        # print(f"✅ Image analysis completed successfully")
         return JsonResponse({
             'success': True,
             'analysis': analysis_result
         })
         
     except Exception as e:
-        print(f"❌ Error in Image API: {str(e)}")
+        # print(f"❌ Error in Image API: {str(e)}")
         import traceback
         traceback.print_exc()
         return JsonResponse({
@@ -1492,9 +1504,9 @@ def analyze_url_ajax(request):
         news_url = request.POST.get('news_url', '').strip()
         publish_date = request.POST.get('publish_date', '')
         
-        print(f"\n🌐 URL AJAX API Request received:")
-        print(f"   📍 URL to analyze: {news_url}")
-        print(f"   📅 Manual date: {publish_date if publish_date else 'Not provided'}")
+        # print(f"\n🌐 URL AJAX API Request received:")
+        # print(f"   📍 URL to analyze: {news_url}")
+        # print(f"   📅 Manual date: {publish_date if publish_date else 'Not provided'}")
         
         if not news_url:
             return JsonResponse({
@@ -1503,7 +1515,7 @@ def analyze_url_ajax(request):
             }, status=400)
         
         # Analyze the URL using existing function
-        print(f"🚀 Starting URL analysis...")
+        # print(f"🚀 Starting URL analysis...")
         analyzed_article = analyze_news_url(news_url, publish_date if publish_date else None)
         
         # Format response similar to image analysis
@@ -1531,14 +1543,14 @@ def analyze_url_ajax(request):
                 'similarity_score': news.get('similarity_score', 0)
             })
         
-        print(f"✅ URL analysis completed successfully")
+        # print(f"✅ URL analysis completed successfully")
         return JsonResponse({
             'success': True,
             'analysis': analysis_result
         })
         
     except Exception as e:
-        print(f"❌ Error in URL AJAX API: {str(e)}")
+        # print(f"❌ Error in URL AJAX API: {str(e)}")
         import traceback
         traceback.print_exc()
         return JsonResponse({
@@ -1559,10 +1571,10 @@ def generate_ai_content_summary_api(request):
         related_news = data.get('related_news', [])
         keywords = data.get('keywords', [])
         
-        print(f"\n🤖 AI Content Summary API called")
-        print(f"📝 OCR Text: {ocr_text[:100]}...")
-        print(f"📊 Related articles: {len(related_news)}")
-        print(f"🔑 Keywords: {keywords[:5]}")
+        # print(f"\n🤖 AI Content Summary API called")
+        # print(f"📝 OCR Text: {ocr_text[:100]}...")
+        # print(f"📊 Related articles: {len(related_news)}")
+        # print(f"🔑 Keywords: {keywords[:5]}")
         
         if not ocr_text or not related_news:
             return JsonResponse({
@@ -1579,7 +1591,7 @@ def generate_ai_content_summary_api(request):
         })
         
     except Exception as e:
-        print(f"❌ Error in AI Content Summary API: {str(e)}")
+        # print(f"❌ Error in AI Content Summary API: {str(e)}")
         import traceback
         traceback.print_exc()
         return JsonResponse({
