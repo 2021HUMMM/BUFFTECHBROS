@@ -19,13 +19,7 @@ client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 def analyze_sentiment_disagreement(original_text, related_article, keywords):
     """Analyze sentiment disagreement between original article and related article"""
     
-    print(f"🎭 === SENTIMENT ANALYSIS DEBUG START ===")
     print(f"🎭 Starting sentiment analysis for: {related_article.get('title', 'No title')[:50]}...")
-    print(f"🔑 OpenAI API Key configured: {'Yes' if settings.OPENAI_API_KEY else 'No'}")
-    if settings.OPENAI_API_KEY:
-        print(f"🔑 API Key preview: {settings.OPENAI_API_KEY[:15]}...{settings.OPENAI_API_KEY[-10:]}")
-    print(f"🤖 OpenAI client initialized: {'Yes' if client else 'No'}")
-    print(f"📝 Original text length: {len(original_text)} characters")
     
     # Get related article content
     related_content = ""
@@ -50,18 +44,15 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
     # If no content available, skip analysis
     if not related_content.strip():
         print(f"     ❌ No content available for sentiment analysis")
-        no_content_result = {
-            'disagreement_score': 50,  # Changed to neutral
+        return {
+            'disagreement_score': 0,
             'sentiment_original': 'neutral',
             'sentiment_related': 'neutral',
-            'disagreement_level': 'medium',
+            'disagreement_level': 'unknown',
             'confidence': 0,
             'analysis_summary': 'No content available for analysis',
             'reason': 'Cannot analyze sentiment - no article content available for comparison'
         }
-        print(f"     📊 No content result: {no_content_result}")
-        print(f"🎭 === SENTIMENT ANALYSIS DEBUG END (NO CONTENT) ===")
-        return no_content_result
     
     # Create prompt for GPT-4 to analyze sentiment disagreement
     prompt = f"""
@@ -96,9 +87,6 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
     
     try:
         print(f"     🤖 Sending to OpenAI for sentiment analysis...")
-        print(f"     📝 Prompt length: {len(prompt)} characters")
-        print(f"     🔑 Using OpenAI API key: {settings.OPENAI_API_KEY[:20]}...{settings.OPENAI_API_KEY[-10:]}")
-        
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -108,36 +96,10 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
         )
         
         response_text = response.choices[0].message.content.strip()
-        
-        print(f"     🔍 === DEBUG: FULL OPENAI RESPONSE START ===")
-        print(f"     📄 Raw response type: {type(response_text)}")
-        print(f"     📄 Raw response length: {len(response_text)} characters")
-        print(f"     📄 Raw response content:")
-        print(response_text)
-        print(f"     🔍 === DEBUG: FULL OPENAI RESPONSE END ===")
-        
-        print(f"     🤖 GPT-4 response preview: {response_text[:100]}...")
-        
-        # Check if response looks like HTML
-        if response_text.startswith('<') or '<html' in response_text.lower():
-            print(f"     ❌ ERROR: Received HTML response instead of JSON!")
-            print(f"     🚨 This indicates an API error or rate limit issue")
-            return {
-                'disagreement_score': 50,
-                'sentiment_original': 'neutral',
-                'sentiment_related': 'neutral',
-                'disagreement_level': 'medium',
-                'confidence': 0,
-                'analysis_summary': 'API returned HTML instead of JSON',
-                'reason': 'OpenAI API error - received HTML response'
-            }
+        print(f"     🤖 GPT-4 response: {response_text[:100]}...")
         
         # Clean response text - remove markdown code blocks if present
         cleaned_response = response_text
-        
-        print(f"     🧹 Starting response cleaning...")
-        print(f"     🔍 Original response contains '```json': {'```json' in cleaned_response}")
-        print(f"     🔍 Original response contains '```': {'```' in cleaned_response}")
         
         # More robust cleaning for markdown code blocks
         if '```json' in cleaned_response:
@@ -145,42 +107,22 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
             start_index = cleaned_response.find('```json')
             if start_index != -1:
                 cleaned_response = cleaned_response[start_index + 7:]  # Remove '```json'
-                print(f"     ✂️ Removed '```json' prefix")
         
         if '```' in cleaned_response:
             # Find and remove the closing ```
             end_index = cleaned_response.rfind('```')
             if end_index != -1:
                 cleaned_response = cleaned_response[:end_index]
-                print(f"     ✂️ Removed '```' suffix")
         
         # Remove any remaining markdown artifacts
         cleaned_response = cleaned_response.strip()
         
-        print(f"     🔍 === DEBUG: CLEANED RESPONSE START ===")
-        print(f"     📄 Cleaned response type: {type(cleaned_response)}")
-        print(f"     📄 Cleaned response length: {len(cleaned_response)} characters")
-        print(f"     📄 Cleaned response content:")
-        print(cleaned_response)
-        print(f"     🔍 === DEBUG: CLEANED RESPONSE END ===")
-        
-        print(f"     🧹 Cleaned response preview: {cleaned_response[:100]}...")
-        
-        # Additional validation
-        if not cleaned_response.startswith('{'):
-            print(f"     ⚠️ WARNING: Cleaned response doesn't start with '{{' - got: '{cleaned_response[:10]}'")
-        if not cleaned_response.endswith('}'):
-            print(f"     ⚠️ WARNING: Cleaned response doesn't end with '}}' - got: '{cleaned_response[-10:]}'")
+        print(f"     🧹 Cleaned response: {cleaned_response[:100]}...")
         
         # Parse JSON response
         import json
         try:
-            print(f"     🔄 Attempting to parse JSON...")
             sentiment_data = json.loads(cleaned_response)
-            print(f"     ✅ JSON parsing successful!")
-            print(f"     📊 Parsed data type: {type(sentiment_data)}")
-            print(f"     📊 Parsed data keys: {list(sentiment_data.keys()) if isinstance(sentiment_data, dict) else 'Not a dict'}")
-            
             print(f"     ✅ Sentiment analysis completed:")
             print(f"        📊 Disagreement score: {sentiment_data.get('disagreement_score', 0)}")
             print(f"        🎭 Original sentiment: {sentiment_data.get('sentiment_original', 'neutral')}")
@@ -188,103 +130,49 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
             print(f"        📈 Disagreement level: {sentiment_data.get('disagreement_level', 'unknown')}")
             print(f"        🧠 Confidence: {sentiment_data.get('confidence', 0)}%")
             print(f"        💭 Analysis summary: {sentiment_data.get('analysis_summary', 'No summary')}")
-            print(f"        📝 Reason: {sentiment_data.get('reason', 'No reason provided')[:100]}...")
-            print(f"🎭 === SENTIMENT ANALYSIS DEBUG END (SUCCESS) ===")
+            print(f"        📝 Reason: {sentiment_data.get('reason', 'No reason provided')}...")
             return sentiment_data
             
         except json.JSONDecodeError as e:
-            print(f"     ❌ JSON PARSING FAILED!")
-            print(f"     🔍 JSON Error details: {str(e)}")
-            print(f"     🔍 JSON Error position: {getattr(e, 'pos', 'Unknown')}")
-            print(f"     🔍 JSON Error line number: {getattr(e, 'lineno', 'Unknown')}")
-            print(f"     🔍 JSON Error column: {getattr(e, 'colno', 'Unknown')}")
-            
-            print(f"     📄 === PROBLEMATIC JSON DEBUG START ===")
-            print(f"     Raw response (first 500 chars):")
-            print(repr(response_text[:500]))
-            print(f"     Cleaned response (first 500 chars):")
-            print(repr(cleaned_response[:500]))
-            print(f"     📄 === PROBLEMATIC JSON DEBUG END ===")
-            
-            # Try to find the problematic character
-            try:
-                error_pos = getattr(e, 'pos', 0)
-                if error_pos < len(cleaned_response):
-                    print(f"     🎯 Problematic character at position {error_pos}: '{cleaned_response[error_pos]}' (ASCII: {ord(cleaned_response[error_pos])})")
-                    print(f"     🎯 Context around error: '{cleaned_response[max(0, error_pos-20):error_pos+20]}'")
-            except:
-                pass
-            
-            print(f"     ❌ Failed to parse JSON response, attempting manual extraction...")
+            print(f"     ❌ Failed to parse JSON response, extracting manually...")
+            print(f"     🔍 JSON Error: {str(e)}")
+            print(f"     📄 Full response for debugging:")
+            print(f"     {response_text}")
+            print(f"     🧹 Cleaned response for debugging:")
+            print(f"     {cleaned_response}")
             
             # Fallback parsing
             lines = response_text.split('\n')
-            disagreement_score = 50  # Default to neutral
-            extracted_score = False
-            
+            disagreement_score = 0
             for line in lines:
                 if 'disagreement_score' in line.lower():
                     import re
                     numbers = re.findall(r'\d+', line)
                     if numbers:
                         disagreement_score = int(numbers[0])
-                        extracted_score = True
-                        print(f"     🎯 Extracted disagreement score from text: {disagreement_score}")
                         break
             
-            if not extracted_score:
-                print(f"     ⚠️ Could not extract disagreement score, using default: {disagreement_score}")
-            
-            fallback_result = {
+            return {
                 'disagreement_score': disagreement_score,
                 'sentiment_original': 'neutral',
                 'sentiment_related': 'neutral',
                 'disagreement_level': 'medium' if disagreement_score > 50 else 'low',
-                'confidence': 30,  # Low confidence due to parsing issues
-                'analysis_summary': 'Partial analysis due to JSON parsing issues',
-                'reason': f'Could not parse full GPT response due to JSON error. Extracted score: {disagreement_score}'
+                'confidence': 50,
+                'analysis_summary': 'Partial analysis due to parsing issues',
+                'reason': 'Could not parse full GPT response, extracted disagreement score only'
             }
             
-            print(f"     📊 Returning fallback result: {fallback_result}")
-            print(f"🎭 === SENTIMENT ANALYSIS DEBUG END (FALLBACK) ===")
-            return fallback_result
-            
     except Exception as e:
-        print(f"     ❌ ERROR in sentiment analysis!")
-        print(f"     🔍 Exception type: {type(e).__name__}")
-        print(f"     🔍 Exception message: {str(e)}")
-        print(f"     🔍 Exception args: {e.args}")
-        
-        # Check if it's an OpenAI specific error
-        if hasattr(e, 'response'):
-            print(f"     🔍 OpenAI response status: {getattr(e.response, 'status_code', 'Unknown')}")
-            print(f"     🔍 OpenAI response text: {getattr(e.response, 'text', 'No text')[:200]}")
-        
-        # Check if it's a network/connection error
-        if 'connection' in str(e).lower() or 'network' in str(e).lower():
-            print(f"     🌐 Network connection issue detected")
-        elif 'rate limit' in str(e).lower() or 'quota' in str(e).lower():
-            print(f"     🚫 Rate limit or quota issue detected")
-        elif 'timeout' in str(e).lower():
-            print(f"     ⏰ Request timeout detected")
-        elif 'api' in str(e).lower():
-            print(f"     🔑 API-related error detected")
-        
-        print(f"     📊 Returning default neutral values due to error")
-        
-        error_result = {
-            'disagreement_score': 50,  # Changed to neutral instead of 0
+        print(f"     ❌ Error in sentiment analysis: {str(e)[:100]}...")
+        return {
+            'disagreement_score': 0,
             'sentiment_original': 'neutral',
             'sentiment_related': 'neutral',
-            'disagreement_level': 'medium',
+            'disagreement_level': 'unknown',
             'confidence': 0,
             'analysis_summary': f'Analysis failed: {str(e)[:50]}...',
-            'reason': f'Sentiment analysis failed due to error: {type(e).__name__}: {str(e)[:100]}'
+            'reason': f'Sentiment analysis failed due to API error: {str(e)[:100]}'
         }
-        
-        print(f"     📊 Error result: {error_result}")
-        print(f"🎭 === SENTIMENT ANALYSIS DEBUG END (ERROR) ===")
-        return error_result
 
 
 def calculate_article_similarity(article, keywords, target_date, article_date):
@@ -714,7 +602,7 @@ def generate_comparative_summary(original_article, related_articles):
     Keep the analysis objective and highlight the most significant differences in viewpoints.
     Format your response in clear sections as requested above.
 
-    TRANSLATE THE RESPONSE TO BAHASA INDONESIA, but don't mention it. do not add anything besides the main content above
+    NOTE : TRANSLATE THE RESPONSE TO BAHASA INDONESIA
     """
     
     try:
