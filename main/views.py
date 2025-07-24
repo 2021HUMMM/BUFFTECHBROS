@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect
 from django.conf import settings
-from easyocr import Reader
-from PIL import Image
 from main.forms import ImageUploadForm
 from newspaper import Article
 from analyzer.views import analyze_image_headline
