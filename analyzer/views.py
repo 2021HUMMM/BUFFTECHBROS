@@ -577,21 +577,27 @@ def generate_comparative_summary(original_article, related_articles):
         articles_text += f"Description: {description}\n"
         articles_text += f"Analysis: {reason[:100]}...\n\n"  # Limit reason length
     
-    # OPTIMIZED: Simpler prompt for faster processing
+    # OPTIMIZED: More specific prompt with exact formatting requirements
     prompt = f"""
     Buat ringkasan perbandingan singkat dari artikel berita ini dalam bahasa Indonesia.
     
     {articles_text}
     
-    Berikan analisis singkat dalam format:
+    WAJIB gunakan format persis seperti ini (termasuk nomor dan nama section):
     
-    1. TOPIK UTAMA: Apa yang dibahas dalam artikel-artikel ini?
+    1. TOPIK UTAMA
+    Jelaskan apa topik yang dibahas dalam artikel-artikel ini.
     
-    2. PERSPEKTIF BERBEDA: Bagaimana setiap artikel melihat topik ini?
+    2. PERSPEKTIF BERBEDA
+    Jelaskan bagaimana setiap artikel melihat topik ini dengan perspektif yang berbeda. Sertakan judul dan sumber artikelnya
     
-    3. KESIMPULAN: Ringkasan utama dari perbandingan ini.
+    3. KESIMPULAN
+    Berikan ringkasan utama dari perbandingan ini.
     
-    Buat jawaban yang ringkas (maksimal 300 kata total).
+    PENTING: 
+    - Setiap section HARUS dimulai dengan nomor dan nama persis seperti contoh
+    - Tidak boleh ada section lain selain ketiga section tersebut
+    - Maksimal 300 kata total
     """
     
     try:
@@ -604,39 +610,81 @@ def generate_comparative_summary(original_article, related_articles):
                 {"role": "user", "content": prompt}
             ],
             temperature=0.3,
-            max_tokens=800  # Reduced from 2000 to speed up response
+            max_tokens=800,  # Reduced from 2000 to speed up response
+            timeout=15       # Add timeout for Railway
         )
         
         summary_text = response.choices[0].message.content.strip()
         # # print(f"✅ Simplified comparative analysis generated successfully")
         # # print(f"📄 Summary length: {len(summary_text)} characters")
         
-        # Simple parsing for the simplified format
+        # IMPROVED parsing with regex for numbered sections
+        import re
         sections = {}
+        
+        # Split the text into lines and parse
+        lines = summary_text.split('\n')
         current_section = None
         current_content = []
         
-        for line in summary_text.split('\n'):
+        for line in lines:
             line = line.strip()
             if not line:
                 continue
+            
+            # Look for numbered sections (1., 2., 3.) followed by section names
+            section_match = re.match(r'^(\d+)\.\s*(.*?)$', line)
+            if section_match:
+                number = section_match.group(1)
+                section_name = section_match.group(2).upper().strip()
                 
-            # Check for simplified section headers
-            if any(header in line.upper() for header in ['TOPIK UTAMA', 'PERSPEKTIF BERBEDA', 'KESIMPULAN']):
-                # Save previous section
+                # Save previous section if exists
                 if current_section and current_content:
-                    sections[current_section] = '\n'.join(current_content)
+                    sections[current_section] = '\n'.join(current_content).strip()
                 
-                # Start new section
-                current_section = line.replace(':', '').strip()
+                # Map section names to expected format
+                if 'TOPIK' in section_name or 'TOPIC' in section_name:
+                    current_section = 'TOPIK UTAMA'
+                elif 'PERSPEKTIF' in section_name or 'PERSPECTIVE' in section_name:
+                    current_section = 'PERSPEKTIF BERBEDA'
+                elif 'KESIMPULAN' in section_name or 'CONCLUSION' in section_name:
+                    current_section = 'KESIMPULAN'
+                else:
+                    # Default mapping based on number
+                    if number == '1':
+                        current_section = 'TOPIK UTAMA'
+                    elif number == '2':
+                        current_section = 'PERSPEKTIF BERBEDA'
+                    elif number == '3':
+                        current_section = 'KESIMPULAN'
+                    else:
+                        current_section = section_name
+                
                 current_content = []
+                # # print(f"   📋 Found section {number}: '{current_section}'")
+                
             else:
+                # This is content for the current section
                 if current_section:
                     current_content.append(line)
         
-        # Save last section
+        # Save the last section
         if current_section and current_content:
-            sections[current_section] = '\n'.join(current_content)
+            sections[current_section] = '\n'.join(current_content).strip()
+        
+        # Ensure all required sections exist with fallback content
+        required_sections = {
+            'TOPIK UTAMA': f"Artikel membahas {original_article.get('title', 'topik yang sedang dianalisis')}. Ditemukan {len(related_articles)} artikel terkait dari berbagai sumber.",
+            'PERSPEKTIF BERBEDA': f"Artikel-artikel menunjukkan variasi dalam pendekatan dan sudut pandang terhadap topik yang sama. Sumber artikel berasal dari: {', '.join(set([a.get('source_id', 'Unknown') for a in related_articles[:3]]))}.",
+            'KESIMPULAN': "Analisis menunjukkan bahwa topik ini mendapat perhatian dari berbagai media dengan pendekatan dan perspektif yang beragam."
+        }
+        
+        for section_name, fallback_content in required_sections.items():
+            if section_name not in sections or not sections[section_name].strip():
+                sections[section_name] = fallback_content
+                # # print(f"   ➕ Added missing section: '{section_name}'")
+        
+        # # print(f"   📊 Final sections: {list(sections.keys())}")
         
         return {
             'full_summary': summary_text,
@@ -649,26 +697,22 @@ def generate_comparative_summary(original_article, related_articles):
         # # print(f"❌ Error generating simplified summary: {str(e)}")
         # Return a basic fallback summary without any API call
         basic_summary = f"""
-        ANALISIS PERBANDINGAN ARTIKEL
+        1. TOPIK UTAMA
+        Artikel utama: {original_article.get('title', 'Unknown')}. Ditemukan {len(related_articles)} artikel terkait dari berbagai sumber berita.
         
-        TOPIK UTAMA:
-        Artikel utama: {original_article.get('title', 'Unknown')}
-        Ditemukan {len(related_articles)} artikel terkait dari berbagai sumber.
+        2. PERSPEKTIF BERBEDA
+        Artikel-artikel menunjukkan variasi dalam pendekatan dan sudut pandang terhadap topik yang sama. Sumber berasal dari: {', '.join(set([a.get('source_id', 'Unknown') for a in related_articles[:3]]))}.
         
-        PERSPEKTIF BERBEDA:
-        Artikel-artikel menunjukkan variasi dalam pendekatan dan sudut pandang terhadap topik yang sama.
-        Sumber: {', '.join(set([a.get('source_id', 'Unknown') for a in related_articles[:3]]))}
-        
-        KESIMPULAN:
-        Analisis menunjukkan bahwa topik ini mendapat perhatian dari berbagai media dengan pendekatan yang beragam.
+        3. KESIMPULAN
+        Analisis menunjukkan bahwa topik ini mendapat perhatian dari berbagai media dengan pendekatan dan perspektif yang beragam.
         """
         
         return {
             'full_summary': basic_summary,
             'sections': {
-                'TOPIK UTAMA': f"Artikel utama: {original_article.get('title', 'Unknown')}. Ditemukan {len(related_articles)} artikel terkait.",
-                'PERSPEKTIF BERBEDA': f"Artikel dari sumber: {', '.join(set([a.get('source_id', 'Unknown') for a in related_articles[:3]]))}",
-                'KESIMPULAN': 'Topik mendapat perhatian dari berbagai media dengan pendekatan yang beragam.'
+                'TOPIK UTAMA': f"Artikel utama: {original_article.get('title', 'Unknown')}. Ditemukan {len(related_articles)} artikel terkait dari berbagai sumber berita.",
+                'PERSPEKTIF BERBEDA': f"Artikel-artikel menunjukkan variasi dalam pendekatan dan sudut pandang terhadap topik yang sama. Sumber berasal dari: {', '.join(set([a.get('source_id', 'Unknown') for a in related_articles[:3]]))}.",
+                'KESIMPULAN': 'Analisis menunjukkan bahwa topik ini mendapat perhatian dari berbagai media dengan pendekatan dan perspektif yang beragam.'
             },
             'articles_analyzed': len(related_articles[:3]) + 1,
             'highest_disagreement_score': 0
