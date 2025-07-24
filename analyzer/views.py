@@ -75,13 +75,13 @@ def analyze_sentiment_disagreement(original_text, related_article, keywords):
     
     Respond in this exact JSON format:
     {{
-        "disagreement_score": <number 0-100>,
-        "sentiment_original": <positive/negative/neutral>,
-        "sentiment_related": <positive/negative/neutral>,
-        "disagreement_level": <high/medium/low/minimal>,
-        "confidence": <number 0-100>,
-        "analysis_summary": <brief explanation of the disagreement or agreement>,
-        "reason": <detailed explanation of why this disagreement score was given, mentioning specific points of agreement or disagreement>
+        "disagreement_score": "number 0-100",
+        "sentiment_original": "positive/negative/neutral",
+        "sentiment_related": "positive/negative/neutral",
+        "disagreement_level": "high/medium/low/minimal",
+        "confidence": "number 0-100",
+        "analysis_summary": "brief explanation of the disagreement or agreement",
+        "reason": "detailed explanation of why this disagreement score was given, mentioning specific points of agreement or disagreement"
     }}
     """
     
