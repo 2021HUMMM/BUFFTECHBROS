@@ -26,7 +26,7 @@ NEWS_API_KEY_2 = config('NEWS_API_KEY_2')  # Uncomment if you have a second API 
 SECRET_KEY = 'django-insecure-)_6_pfe@%swl(t_13d^zx8^7qa67za7m9!s34_4^_7&r&rv$re'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "bufftechbros-production.up.railway.app"]
 
